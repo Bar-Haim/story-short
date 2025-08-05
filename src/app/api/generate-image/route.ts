@@ -21,20 +21,17 @@ export async function POST(request: NextRequest) {
 
     const imagePrompt = createImagePrompt(text, style, sceneType);
 
-    const response = await fetch('https://openrouter.ai/api/v1/images/generations', {
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openRouterApiKey}`,
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://storyshort.app',
-        'X-Title': 'StoryShort - AI Video Generation',
       },
       body: JSON.stringify({
         model: 'dall-e-3',
         prompt: imagePrompt,
         n: 1,
         size: '1024x1024',
-        quality: 'standard',
         response_format: 'b64_json',
       }),
     });

@@ -23,7 +23,6 @@ StoryShort is a Next.js 15 application that demonstrates an AI-powered video gen
 - npm or yarn
 - OpenAI API key
 - ElevenLabs API key
-- OpenRouter API key
 - Supabase account and project
 
 ### Installation
@@ -43,18 +42,20 @@ npm install
    - Create a new project at [supabase.com](https://supabase.com)
    - Go to Settings → API to get your project URL and anon key
    - Run the SQL schema in the SQL Editor:
-   ```sql
-   -- Copy and paste the contents of supabase-schema.sql
-   ```
+     - Copy and paste the contents of `setup-database.sql` into the SQL Editor
+     - Click **Run** to execute the schema
+   - Create a storage bucket:
+     - Go to **Storage** in your Supabase dashboard
+     - Create a new bucket named `assets` and make it public
+   - See `supabase-setup.md` for detailed instructions
 
 4. Set up environment variables:
 ```bash
-# Create a .env.local file in the root directory
-echo "OPENAI_API_KEY=your_openai_api_key_here" > .env.local
-echo "ELEVENLABS_API_KEY=your_elevenlabs_api_key_here" >> .env.local
-echo "OPENROUTER_API_KEY=your_openrouter_api_key_here" >> .env.local
-echo "NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url" >> .env.local
-echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key" >> .env.local
+# Create a .env.local file in the root directory with:
+OPENAI_API_KEY=your_openai_api_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 5. Run the development server:
@@ -70,9 +71,14 @@ npm run dev
 ```sql
 CREATE TABLE videos (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'script_generated', 'rendering', 'completed', 'failed')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'script_generated', 'generating_assets', 'assets_generated', 'rendering', 'completed', 'failed')),
   input_text TEXT NOT NULL,
-  script JSONB,
+  script TEXT,
+  storyboard_json JSONB,
+  audio_url TEXT,
+  captions_url TEXT,
+  image_urls TEXT[],
+  total_duration INTEGER,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -81,9 +87,11 @@ CREATE TABLE videos (
 ### Status Flow
 1. **pending**: Initial state when video request is created
 2. **script_generated**: Script has been successfully generated
-3. **rendering**: Video is being rendered (future feature)
-4. **completed**: Video generation is complete (future feature)
-5. **failed**: An error occurred during processing
+3. **generating_assets**: Assets (images, audio, captions) are being generated
+4. **assets_generated**: All assets have been successfully generated and uploaded
+5. **rendering**: Video is being rendered (future feature)
+6. **completed**: Video generation is complete (future feature)
+7. **failed**: An error occurred during processing
 
 ## API Routes
 
@@ -250,6 +258,25 @@ The application is designed to be easily customizable:
 - Custom image style presets
 - Batch image generation for different scenes
 - Real-time status updates via Supabase subscriptions
+
+## Troubleshooting
+
+### OpenAI API Issues
+
+If you get "Failed to generate script from OpenAI" errors:
+
+1. **Verify API Key Format**: Your OpenAI API key should start with `sk-`
+2. **Check Credits**: Ensure you have sufficient credits in your OpenAI account
+3. **Test Connectivity**: Check your API key at https://platform.openai.com/api-keys
+4. **Model Availability**: Verify that `gpt-4` is available in your OpenAI account
+5. **Check Logs**: Look at the browser console and server logs for detailed error messages
+
+### Common Issues
+
+1. **Environment Variables**: Ensure all required environment variables are set in `.env.local`
+2. **API Keys**: Verify your API keys are valid and have sufficient credits
+3. **Database**: Make sure Supabase is properly configured and the `videos` table exists
+4. **Network**: Check your internet connection and firewall settings
 
 ## License
 
