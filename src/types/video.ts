@@ -37,6 +37,12 @@ export interface VideoStatusResponse {
   total_duration?: number;
   created_at?: string;
   updated_at?: string;
+  ready?: {
+    images: boolean;
+    audio: boolean;
+    captions: boolean;
+  };
+  render_progress?: number;
 }
 
 export interface Scene {

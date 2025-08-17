@@ -586,10 +586,10 @@ export default function FinalizePage() {
                   href={`/render/${videoId}`}
                   className="inline-block px-8 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                 >
-                  Finalize Video
+                  Proceed to Rendering
                 </Link>
                 <p className="text-sm text-gray-600 mt-2">
-                  All assets are ready! Click to proceed to rendering.
+                  All assets are ready! Click to start video rendering.
                 </p>
               </div>
             )}

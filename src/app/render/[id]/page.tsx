@@ -23,7 +23,7 @@ export default function RenderPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Poll video status every 3 seconds (less frequent than wait page)
+  // Poll video status every 2 seconds and trigger rendering if needed
   useEffect(() => {
     if (!id) return;
 
@@ -60,10 +60,43 @@ export default function RenderPage() {
     pollStatus();
     
     // Set up polling interval
-    const interval = setInterval(pollStatus, 3000);
+    const interval = setInterval(pollStatus, 2000);
     
     return () => clearInterval(interval);
   }, [id]);
+
+  // Trigger rendering when assets are ready
+  useEffect(() => {
+    if (!videoStatus || !id) return;
+
+    const triggerRendering = async () => {
+      // Only trigger if assets are ready and we're not already rendering/completed
+      if (videoStatus.ready?.images && videoStatus.ready?.audio && videoStatus.ready?.captions &&
+          !['rendering', 'completed'].includes(videoStatus.status)) {
+        
+        console.log('🚀 Assets ready, triggering video rendering...');
+        
+        try {
+          const response = await fetch('/api/render-video', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ videoId: id })
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Rendering triggered:', result);
+          } else {
+            console.error('❌ Failed to trigger rendering:', response.status);
+          }
+        } catch (error) {
+          console.error('❌ Error triggering rendering:', error);
+        }
+      }
+    };
+
+    triggerRendering();
+  }, [videoStatus, id]);
 
   const handleViewVideo = () => {
     router.push(`/video/${id}`);
@@ -199,17 +232,38 @@ export default function RenderPage() {
           </div>
 
           {/* Rendering Progress Indicator */}
-          {isRendering && (
+          {(isRendering || videoStatus.status === 'rendering') && (
             <div className="mb-8">
               <div className="flex justify-between text-sm text-gray-600 mb-2">
                 <span>Rendering Progress</span>
-                <span>In Progress...</span>
+                <span>{videoStatus.render_progress || 0}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '75%' }}></div>
+                <div 
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-500" 
+                  style={{ width: `${videoStatus.render_progress || 0}%` }}
+                ></div>
               </div>
               <div className="text-xs text-gray-500 mt-2 text-center">
-                Adding subtitles and finalizing video...
+                {videoStatus.render_progress && videoStatus.render_progress < 50 
+                  ? 'Downloading assets and preparing video...'
+                  : videoStatus.render_progress && videoStatus.render_progress < 80
+                  ? 'Processing video with FFmpeg...'
+                  : videoStatus.render_progress && videoStatus.render_progress < 100
+                  ? 'Uploading final video...'
+                  : 'Adding subtitles and finalizing video...'}
+              </div>
+            </div>
+          )}
+
+          {/* Asset Status Summary */}
+          {videoStatus.status === 'assets_generating' && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center justify-center gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                <span className="text-blue-800 font-medium">
+                  Generating audio and captions... Please wait while we prepare your video assets.
+                </span>
               </div>
             </div>
           )}
@@ -218,21 +272,29 @@ export default function RenderPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-2xl font-bold text-gray-900">
-                {videoStatus.progress.imagesTotal}
+                {videoStatus.storyboard_json?.scenes?.length || 0}
               </div>
               <div className="text-sm text-gray-600">Total Scenes</div>
             </div>
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-2xl font-bold text-gray-900">
-                {videoStatus.progress.audioDone ? '✅' : '❌'}
+                {videoStatus.ready?.audio ? '✅' : 
+                 videoStatus.status === 'assets_generating' ? '🔄' : '❌'}
               </div>
-              <div className="text-sm text-gray-600">Audio Track</div>
+              <div className="text-sm text-gray-600">
+                {videoStatus.ready?.audio ? 'Audio Ready' : 
+                 videoStatus.status === 'assets_generating' ? 'Generating...' : 'Audio Missing'}
+              </div>
             </div>
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-2xl font-bold text-gray-900">
-                {videoStatus.progress.captionsDone ? '✅' : '❌'}
+                {videoStatus.ready?.captions ? '✅' : 
+                 videoStatus.status === 'assets_generating' ? '🔄' : '❌'}
               </div>
-              <div className="text-sm text-gray-600">Subtitles</div>
+              <div className="text-sm text-gray-600">
+                {videoStatus.ready?.captions ? 'Subtitles Ready' : 
+                 videoStatus.status === 'assets_generating' ? 'Generating...' : 'Subtitles Missing'}
+              </div>
             </div>
           </div>
 
@@ -247,14 +309,18 @@ export default function RenderPage() {
             
             <button
               onClick={handleViewVideo}
-              disabled={!videoStatus.canView}
+              disabled={!videoStatus.final_video_url}
               className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                videoStatus.canView
+                videoStatus.final_video_url
                   ? 'bg-green-600 text-white hover:bg-green-700'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }`}
             >
-              {isCompleted ? 'View Video' : 'View Video (Not Ready)'}
+              {videoStatus.final_video_url 
+                ? 'View Video' 
+                : videoStatus.status === 'rendering'
+                ? 'Rendering in Progress...'
+                : 'View Video (Not Ready)'}
             </button>
           </div>
 

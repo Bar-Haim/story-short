@@ -187,6 +187,15 @@ export async function GET(request: NextRequest) {
           audio: hasAudio,
           captions: hasCaptions
         },
+        // Render progress from DB
+        render_progress: video.render_progress || 0,
+        // Progress object for backward compatibility - derived from DB fields
+        progressDetails: {
+          imagesDone: hasImages ? (Array.isArray(video.image_urls) ? video.image_urls.length : 0) : 0,
+          imagesTotal: video.storyboard_json?.scenes?.length || 0,
+          audioDone: hasAudio,
+          captionsDone: hasCaptions
+        },
         // Composite readiness for backward compatibility
         assets: {
           images: hasImages ? (Array.isArray(video.image_urls) ? video.image_urls.length : 0) : 0,
