@@ -301,54 +301,54 @@ function mergeImageUrls(existing: string[] | null | undefined, newly: string[]):
 
 export async function POST(req: NextRequest) {
   try {
-    const { videoId } = await req.json();
+    const { videoId, force = false } = await req.json();
     if (!videoId) return NextResponse.json({ ok: false, error: 'missing_videoId' }, { status: 400 });
 
-    console.log(`[assets] Starting asset orchestration for videoId: ${videoId}`);
+    console.log(`[assets] Starting asset orchestration for videoId: ${videoId}, force: ${force}`);
 
     const video = await VideoService.getById(videoId);
     if (!video) return NextResponse.json({ ok: false, error: 'not_found' }, { status: 404 });
 
     console.log(`[assets] Current status: ${video.status}`);
 
-    // Check if assets are already generated - return success if so
-    if (video.status === 'assets_generated' || video.status === 'render_ready') {
-      console.log(`[assets] Assets already generated (status: ${video.status}), returning success`);
-      
-      const hasImages = Array.isArray(video.image_urls) && video.image_urls.length > 0;
-      const hasAudio = !!video.audio_url;
-      const hasCaptions = !!video.captions_url;
+    // Check if assets are actually ready by examining DB fields (single source of truth)
+    const hasImages = Array.isArray(video.image_urls) && video.image_urls.length > 0;
+    const hasAudio = !!video.audio_url;
+    const hasCaptions = !!video.captions_url;
+    const assetsActuallyReady = hasImages && hasAudio && hasCaptions;
+
+    // If assets are actually ready, return success regardless of status
+    if (assetsActuallyReady) {
+      console.log(`[assets] Assets actually ready (DB check), returning ready status`);
       
       return NextResponse.json({
-        ok: true,
-        status: video.status,
-        ran: { 
-          images: false, 
-          audio: false, 
-          captions: false 
-        },
-        urls: {
-          audio: video.audio_url || undefined,
-          captions: video.captions_url || undefined
-        },
-        nextStatus: video.status,
-        message: 'Assets already generated',
-        note: 'Assets already generated',
-        assets: {
-          images: hasImages ? video.image_urls.length : 0,
-          totalScenes: video.storyboard_json?.scenes?.length || 0,
-          audio: hasAudio,
-          captions: hasCaptions
-        }
+        status: 'assets_generated',
+        message: 'All assets ready',
+        audio_url: video.audio_url,
+        captions_url: video.captions_url
       }, { status: 200 });
+    }
+
+    // Handle inconsistent state: if status says "assets_generated" but URLs are missing
+    if (video.status === 'assets_generated' && !assetsActuallyReady) {
+      console.log(`[assets] Inconsistent state detected: status=assets_generated but URLs missing. Auto-downgrading to assets_generating`);
+      
+      // Downgrade status and continue generation
+      await VideoService.updateVideo(videoId, { 
+        status: 'assets_generating',
+        error_message: 'Resuming asset generation due to incomplete state...'
+      });
     }
 
     // Check if we can proceed with asset generation
     const allowedStatuses = ['script_approved', 'storyboard_generated', 'assets_failed', 'assets_generating'];
     
-    if (!allowedStatuses.includes(video.status)) {
+    if (!force && !allowedStatuses.includes(video.status)) {
       console.log(`[assets] Cannot generate assets in status: ${video.status}`);
-      return NextResponse.json({ ok: false, error: `Cannot generate assets in status: ${video.status}` }, { status: 400 });
+      return NextResponse.json({ 
+        status: 'error',
+        error: `Cannot generate assets in status: ${video.status}` 
+      }, { status: 400 });
     }
 
     // Set status to generating if not already
@@ -441,40 +441,82 @@ export async function POST(req: NextRequest) {
     const haveAllImages = mergedUrls.length === totalScenes && mergedUrls.every(url => url && url.trim() !== '');
     console.log(`[assets] Images complete: ${haveAllImages} (${mergedUrls.length}/${totalScenes})`);
 
-    // Asset orchestration: Generate missing audio and captions proactively
+    // Asset orchestration: Generate missing audio and captions in parallel
     let audioUrl = video.audio_url;
     let captionsUrl = video.captions_url;
     let ranAudio = false;
     let ranCaptions = false;
+    let audioError = null;
+    let captionsError = null;
 
-    // Generate audio if missing
+    // Update status to indicate audio generation
     if (!audioUrl) {
-      try {
-        console.log('[assets] Audio missing, generating TTS...');
-        audioUrl = await withRetry(() => generateTTS(video));
-        ranAudio = true;
-        console.log('[assets] Audio generated successfully');
-      } catch (error: any) {
-        console.error('[assets] Audio generation failed:', error.message);
-        // Continue with other assets, don't fail completely
-      }
+      await VideoService.updateVideo(videoId, { 
+        error_message: 'Generating audio...'
+      });
+    }
+
+    // Update status to indicate captions generation
+    if (!captionsUrl) {
+      await VideoService.updateVideo(videoId, { 
+        error_message: 'Generating captions...'
+      });
+    }
+
+    // Generate audio and captions in parallel if missing
+    const generationTasks = [];
+
+    if (!audioUrl) {
+      generationTasks.push(
+        (async () => {
+          try {
+            console.log('[assets] Audio missing, generating TTS...');
+            const generatedAudioUrl = await withRetry(() => generateTTS(video));
+            audioUrl = generatedAudioUrl;
+            ranAudio = true;
+            console.log('[assets] Audio generated successfully');
+            
+            // Update database with audio URL immediately
+            await VideoService.updateVideo(videoId, { audio_url: audioUrl });
+            console.log('[assets] Audio URL saved to database');
+          } catch (error: any) {
+            console.error('[assets] Audio generation failed:', error.message);
+            audioError = error.message;
+          }
+        })()
+      );
     } else {
       console.log('[assets] Audio exists, skipping generation');
     }
 
-    // Generate captions if missing
     if (!captionsUrl) {
-      try {
-        console.log('[assets] Captions missing, generating SRT...');
-        captionsUrl = await withRetry(() => generateCaptions(video));
-        ranCaptions = true;
-        console.log('[assets] Captions generated successfully');
-      } catch (error: any) {
-        console.error('[assets] Captions generation failed:', error.message);
-        // Continue with other assets, don't fail completely
-      }
+      generationTasks.push(
+        (async () => {
+          try {
+            console.log('[assets] Captions missing, generating SRT...');
+            const generatedCaptionsUrl = await withRetry(() => generateCaptions(video));
+            captionsUrl = generatedCaptionsUrl;
+            ranCaptions = true;
+            console.log('[assets] Captions generated successfully');
+            
+            // Update database with captions URL immediately
+            await VideoService.updateVideo(videoId, { captions_url: captionsUrl });
+            console.log('[assets] Captions URL saved to database');
+          } catch (error: any) {
+            console.error('[assets] Captions generation failed:', error.message);
+            captionsError = error.message;
+          }
+        })()
+      );
     } else {
       console.log('[assets] Captions exist, skipping generation');
+    }
+
+    // Wait for all generation tasks to complete
+    if (generationTasks.length > 0) {
+      console.log(`[assets] Waiting for ${generationTasks.length} generation tasks to complete...`);
+      await Promise.allSettled(generationTasks);
+      console.log('[assets] All generation tasks completed');
     }
 
     // If there are failures, set status assets_failed and store a helpful error_message
@@ -497,24 +539,31 @@ export async function POST(req: NextRequest) {
       }, { status: 200 }); // still 200 so UI can show details
     }
 
-    // Determine next status based on asset completeness
-    let nextStatus = 'assets_generating';
-    let statusMessage = '';
+    // Determine final status based on asset completeness - STRICT CHECK
+    let finalStatus = 'assets_generating'; // Default to generating
+    let statusMessage = 'Assets being generated...';
 
+    // Only set to assets_generated if ALL conditions are met
     if (haveAllImages && !!audioUrl && !!captionsUrl) {
-      nextStatus = 'render_ready';
+      finalStatus = 'assets_generated';
       statusMessage = 'All assets ready for rendering';
-    } else if (haveAllImages && (!!audioUrl || !!captionsUrl)) {
-      nextStatus = 'assets_partial';
-      statusMessage = 'Partial assets generated';
+    } else if (audioError || captionsError) {
+      finalStatus = 'assets_failed';
+      const errors = [];
+      if (audioError) errors.push(`Audio: ${audioError}`);
+      if (captionsError) errors.push(`Captions: ${captionsError}`);
+      statusMessage = `Asset generation failed: ${errors.join(', ')}`;
     } else if (!haveAllImages) {
-      nextStatus = 'assets_failed';
+      finalStatus = 'assets_failed';
       statusMessage = 'Image generation failed';
+    } else {
+      // Still generating - don't set to assets_generated yet
+      statusMessage = 'Generating remaining assets...';
     }
 
-    // Update video with current asset state
+    // Update video with final asset state
     await VideoService.updateVideo(videoId, {
-      status: nextStatus,
+      status: finalStatus,
       image_urls: mergedUrls,
       audio_url: audioUrl || null,
       captions_url: captionsUrl || null,
@@ -522,29 +571,26 @@ export async function POST(req: NextRequest) {
       error_message: statusMessage
     });
 
-    // Prepare response with detailed information
-    const response = {
-      ok: true,
-      ran: {
-        audio: ranAudio,
-        captions: ranCaptions
-      },
-      urls: {
-        audio: audioUrl || undefined,
-        captions: captionsUrl || undefined
-      },
-      nextStatus,
-      message: statusMessage,
-      assets: {
-        images: mergedUrls.length,
-        totalScenes,
-        audio: !!audioUrl,
-        captions: !!captionsUrl
-      }
-    };
+    console.log(`[assets] Asset orchestration completed with status: ${finalStatus}`);
 
-    console.log('[assets] Asset orchestration completed:', response);
-    return NextResponse.json(response);
+    if (finalStatus === 'assets_generated') {
+      return NextResponse.json({
+        status: 'assets_generated',
+        message: statusMessage,
+        audio_url: audioUrl,
+        captions_url: captionsUrl
+      }, { status: 200 });
+    } else {
+      return NextResponse.json({
+        status: 'failed',
+        error: statusMessage,
+        details: {
+          audio_error: audioError,
+          captions_error: captionsError,
+          images_complete: haveAllImages
+        }
+      }, { status: 500 });
+    }
     
   } catch (err: unknown) {
     const d = toErrorDetails(err);

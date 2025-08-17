@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import WizardStepper, { defaultSteps } from '@/components/WizardStepper';
 
 interface VideoData {
@@ -16,6 +17,11 @@ interface VideoData {
   progress?: number;
   storyboard_json?: {
     scenes: any[];
+  };
+  ready?: {
+    images: boolean;
+    audio: boolean;
+    captions: boolean;
   };
   assets?: {
     images: number;
@@ -48,39 +54,38 @@ export default function FinalizePage() {
 
   const [video, setVideo] = useState<VideoData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [rendering, setRendering] = useState(false);
   const [error, setError] = useState('');
-  const [dots, setDots] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [regeneratingScenes, setRegeneratingScenes] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (videoId) {
       fetchVideo();
-      // Poll for updates every 1.5 seconds
-      const interval = setInterval(fetchVideo, 1500);
+      // Poll for updates every 2 seconds
+      const interval = setInterval(fetchVideo, 2000);
       return () => clearInterval(interval);
     }
   }, [videoId]);
 
-  // Trigger asset generation on mount if needed
+  // Automatically trigger asset generation on mount if needed
   useEffect(() => {
-    if (video && video.status === 'script_approved' || video?.status === 'storyboard_generated') {
-      triggerAssetGeneration();
+    if (video && !isGenerating) {
+      // Check actual readiness from DB fields, not just status
+      const needsAssets = !video.ready?.audio || !video.ready?.captions || !video.ready?.images;
+      const canGenerate = ['script_approved', 'storyboard_generated', 'assets_failed', 'assets_generating'].includes(video.status);
+      
+      if (needsAssets && canGenerate) {
+        console.log('[finalize] Auto-triggering asset generation - assets not ready:', { 
+          audio: video.ready?.audio, 
+          captions: video.ready?.captions, 
+          images: video.ready?.images 
+        });
+        triggerAssetGeneration();
+      }
     }
-  }, [video]);
+  }, [video, isGenerating]);
 
-  // Animated dots for rendering status
-  useEffect(() => {
-    if (rendering) {
-      const interval = setInterval(() => {
-        setDots(prev => prev.length >= 3 ? '' : prev + '.');
-      }, 500);
-      return () => clearInterval(interval);
-    } else {
-      setDots('');
-    }
-  }, [rendering]);
+
 
   const fetchVideo = async () => {
     try {
@@ -110,70 +115,12 @@ export default function FinalizePage() {
     }
   };
 
-  const handleRender = async () => {
-    setRendering(true);
-    setError('');
-    
-    try {
-      const response = await fetch('/api/render', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ videoId }),
-      });
 
-      let json: any = null;
-      try { 
-        json = await safeJson(response); 
-      } catch {}
-      
-      if (!response.ok || !json?.ok) {
-        throw new Error(json?.error || `Render failed (${response.status})`);
-      }
-
-      // Poll for completion with progress updates
-      let attempts = 0;
-      const maxAttempts = 60; // 3 minutes with 3-second intervals
-      
-      while (attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Faster polling
-        
-        const statusResponse = await fetch(`/api/video-status?id=${videoId}`, { cache: 'no-store' });
-        if (statusResponse.ok) {
-          const statusResult = await safeJson(statusResponse);
-          if (statusResult?.data) {
-            const status = statusResult.data.status;
-            
-            // Update local video state to show progress
-            setVideo(prev => prev ? { ...prev, ...statusResult.data } : prev);
-            
-            if (status === 'completed') {
-              router.push(`/video/${videoId}`);
-              return;
-            } else if (status === 'render_failed') {
-              throw new Error(statusResult.data?.error_message || 'Video rendering failed');
-            }
-          }
-        }
-        
-        attempts++;
-      }
-      
-      throw new Error('Video rendering timed out');
-      
-    } catch (err: any) {
-      console.error('Failed to render video:', err);
-      setError(err.message || 'Failed to render video');
-    } finally {
-      setRendering(false);
-    }
-  };
 
   const triggerAssetGeneration = async () => {
-    if (isLoading) return; // Prevent duplicate calls
+    if (isGenerating) return; // Prevent duplicate calls
     
-    setIsLoading(true);
+    setIsGenerating(true);
     try {
       console.log('[finalize] Triggering asset generation...');
       const response = await fetch('/api/generate-assets', {
@@ -185,7 +132,7 @@ export default function FinalizePage() {
       });
 
       const json = await safeJson(response);
-      if (!response.ok || !json?.ok) {
+      if (!response.ok) {
         const errorMsg = json?.error || `Asset generation failed (${response.status})`;
         if (errorMsg.includes('ELEVENLABS_API_KEY')) {
           setError('Missing ElevenLabs API key. Please check your environment configuration.');
@@ -195,24 +142,65 @@ export default function FinalizePage() {
         return;
       }
 
-      console.log('[finalize] Asset generation triggered:', json);
-      // Refresh to show generating state
-      await fetchVideo();
+      if (json?.status === 'ready') {
+        console.log('[finalize] Assets already ready');
+        await fetchVideo();
+      } else if (json?.status === 'assets_generated') {
+        console.log('[finalize] Asset generation completed successfully');
+        await fetchVideo();
+      } else {
+        console.log('[finalize] Asset generation started');
+        // Continue polling for updates
+      }
       
     } catch (err: any) {
       console.error('Failed to trigger asset generation:', err);
       setError(err.message || 'Failed to trigger asset generation');
     } finally {
-      setIsLoading(false);
+      setIsGenerating(false);
     }
   };
 
-  const handleRetryAssets = async () => {
-    await triggerAssetGeneration();
-  };
 
-  const handleRetryRender = async () => {
-    await handleRender();
+
+
+
+  
+
+  const handleRetryAssets = async () => {
+    if (isGenerating) return;
+    
+    setIsGenerating(true);
+    setError('');
+    
+    try {
+      const response = await fetch('/api/generate-assets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId, force: true })
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to retry asset generation');
+      }
+      
+      const result = await response.json();
+      
+      if (result.status === 'assets_generated') {
+        console.log('✅ Asset generation retry completed successfully');
+        await fetchVideo();
+      } else {
+        console.log('🔄 Asset generation retry started');
+        // Continue polling for updates
+      }
+      
+    } catch (err: any) {
+      console.error('Failed to retry asset generation:', err);
+      setError(err.message || 'Failed to retry asset generation');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   // Handle scene regeneration
@@ -395,14 +383,7 @@ export default function FinalizePage() {
             </span>
           </div>
 
-          {/* Header badge with animated dots */}
-          {video.status === 'rendering' && (
-            <div className="mb-4">
-              <span className="inline-flex items-center rounded-full bg-violet-100 text-violet-700 px-3 py-1 text-sm">
-                {`Rendering Video${dots}`}
-              </span>
-            </div>
-          )}
+
 
           {/* Progress bar */}
           <div className="mb-6">
@@ -490,45 +471,45 @@ export default function FinalizePage() {
                   </svg>
                 )}
               </div>
-              <p className="text-2xl font-bold text-gray-900">{assetsInfo.images}/{totalScenes}</p>
+              <p className="text-2xl font-bold text-gray-900">{video.ready?.images ? (Array.isArray(video.image_urls) ? video.image_urls.length : 0) : 0}/{totalScenes}</p>
               <p className="text-sm text-gray-600">Scene images</p>
             </div>
 
-            {/* Audio */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-semibold text-gray-900">Audio</h3>
-                {assetsInfo.audio ? (
-                  <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                ) : (
-                  <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{assetsInfo.audio ? 'Ready' : 'Missing'}</p>
-              <p className="text-sm text-gray-600">Voiceover audio</p>
+                      {/* Audio */}
+          <div className="bg-gray-50 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold text-gray-900">Audio</h3>
+              {video.ready?.audio ? (
+                <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5 text-blue-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              )}
             </div>
+            <p className="text-2xl font-bold text-gray-900">{video.ready?.audio ? 'Ready' : 'Generating...'}</p>
+            <p className="text-sm text-gray-600">Voiceover audio</p>
+          </div>
 
-            {/* Captions */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-semibold text-gray-900">Captions</h3>
-                {assetsInfo.captions ? (
-                  <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                ) : (
-                  <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{assetsInfo.captions ? 'Ready' : 'Missing'}</p>
-              <p className="text-sm text-gray-600">Subtitle file</p>
+                      {/* Captions */}
+          <div className="bg-gray-50 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-semibold text-gray-900">Captions</h3>
+              {video.ready?.captions ? (
+                <svg className="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5 text-blue-500 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              )}
             </div>
+            <p className="text-2xl font-bold text-gray-900">{video.ready?.captions ? 'Ready' : 'Generating...'}</p>
+            <p className="text-sm text-gray-600">Subtitle file</p>
+          </div>
           </div>
 
           {/* Error Display */}
@@ -598,23 +579,30 @@ export default function FinalizePage() {
 
           {/* Action Buttons */}
           <div className="space-y-4">
-            {/* Main Action */}
-            {(video.status === 'assets_generated' || video.status === 'render_ready') && (
+            {/* Main Action - Finalize Video */}
+            {video.status === 'assets_generated' && video.ready?.audio && video.ready?.captions && video.ready?.images && (
               <div className="text-center">
-                <button
-                  onClick={handleRender}
-                  disabled={rendering || !isReady}
-                  aria-busy={rendering}
-                  className="px-8 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                <Link
+                  href={`/render/${videoId}`}
+                  className="inline-block px-8 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                 >
-                  {rendering ? 'Rendering Video...' : 'Finalize Video'}
-                </button>
-                
-                {rendering && (
-                  <p className="text-sm text-gray-600 mt-2">
-                    This may take a few minutes. Please wait...
-                  </p>
-                )}
+                  Finalize Video
+                </Link>
+                <p className="text-sm text-gray-600 mt-2">
+                  All assets are ready! Click to proceed to rendering.
+                </p>
+              </div>
+            )}
+
+            {/* Asset Generation in Progress */}
+            {(video.status === 'assets_generating' || (!video.ready?.audio || !video.ready?.captions || !video.ready?.images)) && (
+              <div className="text-center">
+                <div className="px-8 py-4 bg-blue-600 text-white rounded-lg opacity-75 cursor-not-allowed">
+                  Generating Assets...
+                </div>
+                <p className="text-sm text-gray-600 mt-2">
+                  Audio and captions are being generated automatically. Please wait...
+                </p>
               </div>
             )}
 
@@ -623,11 +611,11 @@ export default function FinalizePage() {
               <div className="text-center">
                 <button
                   onClick={triggerAssetGeneration}
-                  disabled={isLoading}
-                  aria-busy={isLoading}
+                  disabled={isGenerating}
+                  aria-busy={isGenerating}
                   className="px-8 py-4 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? 'Generating Missing Assets...' : 'Generate Missing Assets'}
+                  {isGenerating ? 'Generating Missing Assets...' : 'Generate Missing Assets'}
                 </button>
                 <p className="mt-2 text-sm text-gray-600">
                   Some assets are ready, generating the rest...
@@ -640,27 +628,19 @@ export default function FinalizePage() {
               <div className="text-center">
                 <button
                   onClick={handleRetryAssets}
-                  disabled={isLoading}
-                  aria-busy={isLoading}
+                  disabled={isGenerating}
+                  aria-busy={isGenerating}
                   className="px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isLoading ? 'Retrying Assets...' : 'Retry Assets'}
+                  {isGenerating ? 'Retrying Assets...' : 'Retry Assets'}
                 </button>
+                <p className="text-sm text-gray-600 mt-2">
+                  Click to retry asset generation
+                </p>
               </div>
             )}
 
-            {video.status === 'render_failed' && (
-              <div className="text-center">
-                <button
-                  onClick={handleRetryRender}
-                  disabled={rendering}
-                  aria-busy={rendering}
-                  className="px-8 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {rendering ? 'Retrying Render...' : 'Retry Render'}
-                </button>
-              </div>
-            )}
+
 
             {/* View Video Button - Only enabled when video is complete and URL exists */}
             {video.status === 'completed' && (

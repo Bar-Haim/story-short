@@ -47,8 +47,8 @@ export async function PATCH(request: NextRequest) {
     // Update dirty scenes array - remove references to deleted scene and adjust indices
     const currentDirtyScenes = Array.isArray(video.dirty_scenes) ? video.dirty_scenes : [];
     const updatedDirtyScenes = currentDirtyScenes
-      .filter(dirtyIndex => dirtyIndex !== index) // Remove the deleted scene index
-      .map(dirtyIndex => dirtyIndex > index ? dirtyIndex - 1 : dirtyIndex); // Shift indices down
+      .filter((dirtyIndex: number) => dirtyIndex !== index) // Remove the deleted scene index
+      .map((dirtyIndex: number) => dirtyIndex > index ? dirtyIndex - 1 : dirtyIndex); // Shift indices down
 
     // Also need to handle image_urls array if it exists
     let updatedImageUrls = video.image_urls;

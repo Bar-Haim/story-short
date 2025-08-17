@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
 
       // Remove scene from dirty scenes list
       const currentDirtyScenes = Array.isArray(video.dirty_scenes) ? video.dirty_scenes : [];
-      const updatedDirtyScenes = currentDirtyScenes.filter(dirtyIndex => dirtyIndex !== index);
+      const updatedDirtyScenes = currentDirtyScenes.filter((dirtyIndex: number) => dirtyIndex !== index);
 
       // Update video record
       const updateResult = await VideoService.updateVideo(id, {
@@ -249,7 +249,7 @@ export async function POST(request: NextRequest) {
 
             // Remove scene from dirty scenes list
             const currentDirtyScenes = Array.isArray(video.dirty_scenes) ? video.dirty_scenes : [];
-            const updatedDirtyScenes = currentDirtyScenes.filter(dirtyIndex => dirtyIndex !== index);
+            const updatedDirtyScenes = currentDirtyScenes.filter((dirtyIndex: number) => dirtyIndex !== index);
 
             // Update video record
             const updateResult = await VideoService.updateVideo(id, {
@@ -308,7 +308,6 @@ export async function POST(request: NextRequest) {
       error: error?.message || 'Internal server error',
       code: error?.code || 'internal_error',
       details: {
-        sceneIndex: index,
         message: error?.message || 'An unexpected error occurred'
       }
     }, { status: 500 });

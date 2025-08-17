@@ -66,11 +66,22 @@ export async function GET(request: NextRequest) {
     let progress = 0;
     let stage = 'Unknown';
     
-    // Check composite readiness for assets
+    // Check composite readiness for assets - SINGLE SOURCE OF TRUTH
     const hasImages = Array.isArray(video.image_urls) && video.image_urls.length > 0;
     const hasAudio = !!video.audio_url;
     const hasCaptions = !!video.captions_url;
     const isRenderReady = hasImages && hasAudio && hasCaptions;
+    
+    // Derive actual status from DB fields, not just the status field
+    let actualStatus = video.status;
+    let actualProgress = progress;
+    let actualStage = stage;
+    
+    // Override status if it's inconsistent with actual DB state
+    if (video.status === 'assets_generated' && !isRenderReady) {
+      console.log(`[video-status] Inconsistent status detected: status=assets_generated but assets not ready. Correcting to assets_generating`);
+      actualStatus = 'assets_generating';
+    }
     
     // Analyze placeholder usage from storyboard scenes
     let placeholdersCount = 0;
@@ -85,79 +96,79 @@ export async function GET(request: NextRequest) {
       });
     }
     
-    switch (video.status) {
+    switch (actualStatus) {
       case 'pending':
-        progress = 10;
-        stage = 'Initializing...';
+        actualProgress = 10;
+        actualStage = 'Initializing...';
         break;
       case 'script_generated':
-        progress = 20;
-        stage = 'Script ready';
+        actualProgress = 20;
+        actualStage = 'Script ready';
         break;
       case 'storyboard_generated':
-        progress = 30;
-        stage = 'Storyboard ready';
+        actualProgress = 30;
+        actualStage = 'Storyboard ready';
         break;
       case 'script_approved':
-        progress = 40;
-        stage = 'Script approved';
+        actualProgress = 40;
+        actualStage = 'Script approved';
         break;
       case 'assets_generating':
-        progress = 50;
-        stage = 'Generating assets...';
+        actualProgress = 50;
+        actualStage = 'Generating assets...';
         break;
       case 'assets_partial':
-        progress = 55;
-        stage = 'Partial assets ready';
+        actualProgress = 55;
+        actualStage = 'Partial assets ready';
         break;
       case 'render_ready':
-        progress = 60;
-        stage = 'All assets ready';
+        actualProgress = 60;
+        actualStage = 'All assets ready';
         break;
       case 'assets_generated':
-        progress = 60;
-        stage = 'Assets ready';
+        actualProgress = 60;
+        actualStage = 'Assets ready';
         break;
       case 'rendering':
-        progress = 80;
-        stage = 'Rendering video...';
+        actualProgress = 80;
+        actualStage = 'Rendering video...';
         break;
       case 'completed':
-        progress = 100;
-        stage = 'Video ready!';
+        actualProgress = 100;
+        actualStage = 'Video ready!';
         break;
       case 'failed':
-        progress = 0;
-        stage = 'Processing failed';
+        actualProgress = 0;
+        actualStage = 'Processing failed';
         break;
       case 'assets_failed':
-        progress = 0;
-        stage = 'Asset generation failed';
+        actualProgress = 0;
+        actualStage = 'Asset generation failed';
         break;
       default:
-        progress = 0;
-        stage = 'Unknown status';
+        actualProgress = 0;
+        actualStage = 'Unknown status';
     }
 
     // If assets are being generated, check image upload progress
-    if (video.status === 'assets_generating' && video.image_upload_progress !== undefined) {
-      progress = 30 + (video.image_upload_progress * 0.3); // 30-60% range
-      stage = `Generating images... ${video.image_upload_progress}%`;
+    if (actualStatus === 'assets_generating' && video.image_upload_progress !== undefined) {
+      actualProgress = 30 + (video.image_upload_progress * 0.3); // 30-60% range
+      actualStage = `Generating images... ${video.image_upload_progress}%`;
     }
 
     // If rendering, check if we have a final video URL
-    if (video.status === 'rendering' && video.final_video_url) {
-      progress = 90;
-      stage = 'Finalizing video...';
+    if (actualStatus === 'rendering' && video.final_video_url) {
+      actualProgress = 90;
+      actualStage = 'Finalizing video...';
     }
 
     return NextResponse.json({
       ok: true,
       data: {
         id: video.id,
-        status: video.status,
-        progress,
-        stage,
+        status: actualStatus, // Use corrected status
+        progress: actualProgress, // Use corrected progress
+        stage: actualStage, // Use corrected stage
         input_text: video.input_text,
         script: video.script,
         storyboard_json: video.storyboard_json,
@@ -170,7 +181,13 @@ export async function GET(request: NextRequest) {
         image_upload_progress: video.image_upload_progress,
         created_at: video.created_at,
         updated_at: video.updated_at,
-        // Add composite readiness information
+        // SINGLE SOURCE OF TRUTH: readiness derived from DB fields
+        ready: {
+          images: hasImages,
+          audio: hasAudio,
+          captions: hasCaptions
+        },
+        // Composite readiness for backward compatibility
         assets: {
           images: hasImages ? (Array.isArray(video.image_urls) ? video.image_urls.length : 0) : 0,
           audio: hasAudio,

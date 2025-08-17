@@ -133,7 +133,10 @@ export default function RenderPage() {
 
   const isRendering = videoStatus.status === 'rendering';
   const isCompleted = videoStatus.status === 'completed';
-  const hasFailed = videoStatus.status === 'failed';
+  const hasFailed = videoStatus.status === 'script_failed' || 
+                   videoStatus.status === 'storyboard_failed' || 
+                   videoStatus.status === 'assets_failed' || 
+                   videoStatus.status === 'render_failed';
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">

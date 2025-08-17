@@ -206,7 +206,7 @@ export default function WaitPage() {
         body: JSON.stringify({ videoId }),
       });
       if (!res.ok) {
-        let err = {};
+        let err: any = {};
         try {
           err = await res.json();
         } catch (parseError) {

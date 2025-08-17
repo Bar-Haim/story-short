@@ -29,6 +29,14 @@ export interface VideoStatusResponse {
   canEdit: boolean;
   canFinalize: boolean;
   canView: boolean;
+  error_message?: string;
+  image_urls?: string[];
+  audio_url?: string;
+  captions_url?: string;
+  storyboard_json?: Storyboard;
+  total_duration?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Scene {

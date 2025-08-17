@@ -123,12 +123,16 @@ export default function ScriptPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [success, setSuccess] = useState('');
   const [requiresRegeneration, setRequiresRegeneration] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   // Script editing state with new approach
   const [hook, setHook] = useState('');
   const [body, setBody] = useState('');
   const [cta, setCta] = useState('');
   const [dirty, setDirty] = useState(false);
+
+  // Refs for accessibility
+  const statusMessageRef = useRef<HTMLDivElement>(null);
 
   // Auto-generation logic and prefill
   const [checkedForGeneration, setCheckedForGeneration] = useState(false);
@@ -212,13 +216,27 @@ export default function ScriptPage() {
 
   const handleSaveAndContinue = async () => {
     try {
-      await handleSave(); // Always saves first
-      
+      // Instant feedback: disable button and show loading message
       setContinuing(true);
+      setStatusMessage('Please wait… moving to the next step.');
+      setErrorMsg(null);
+      setSuccess('');
+      
+      // Focus the status message for screen readers
+      setTimeout(() => {
+        statusMessageRef.current?.focus();
+      }, 100);
+      
+      // Always saves first
+      await handleSave();
+      
+      // Update status message for storyboard generation
+      setStatusMessage('Generating storyboard...');
       
       // If regeneration is required, go directly to storyboard to regenerate assets
       if (requiresRegeneration) {
         console.log('🔄 Script changed, navigating to storyboard for asset regeneration');
+        setStatusMessage('Navigating to storyboard for asset regeneration...');
         router.push(`/storyboard/${videoId}`);
         return;
       }
@@ -237,12 +255,16 @@ export default function ScriptPage() {
         throw new Error(errorData.error || 'Failed to generate storyboard');
       }
 
+      // Update status message before navigation
+      setStatusMessage('Storyboard generated successfully! Navigating...');
+      
       // Navigate to storyboard page
       router.push(`/storyboard/${videoId}`);
       
     } catch (err: any) {
       console.error('Failed to continue:', err);
       setErrorMsg(err.message || 'Failed to save script');
+      setStatusMessage(null);
     } finally {
       setContinuing(false);
     }
@@ -504,7 +526,29 @@ export default function ScriptPage() {
           {/* Error Display */}
           {errorMsg && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700">{errorMsg}</p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <p className="text-red-700 font-medium mb-3">{errorMsg}</p>
+                  <button
+                    onClick={() => {
+                      setErrorMsg(null);
+                      setStatusMessage(null);
+                    }}
+                    className="text-red-600 hover:text-red-800 text-sm font-medium underline"
+                  >
+                    Try again
+                  </button>
+                </div>
+                <button
+                  onClick={() => setErrorMsg(null)}
+                  className="text-red-400 hover:text-red-600 ml-4"
+                  aria-label="Dismiss error"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
             </div>
           )}
 
@@ -694,6 +738,22 @@ export default function ScriptPage() {
             )}
           </div>
 
+          {/* Status Message - Aria Live Region */}
+          {statusMessage && (
+            <div 
+              ref={statusMessageRef}
+              className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg"
+              aria-live="polite"
+              aria-atomic="true"
+              tabIndex={-1}
+            >
+              <div className="flex items-center justify-center gap-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                <span className="text-blue-800 font-medium">{statusMessage}</span>
+              </div>
+            </div>
+          )}
+
           {/* Enhanced Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mt-8">
             <button
@@ -742,16 +802,16 @@ export default function ScriptPage() {
               }}
               disabled={(() => {
                 const isEmpty = !hook.trim() && !body.trim() && !cta.trim();
-                return isSaving || isEmpty;
+                return isSaving || continuing || isEmpty;
               })()}
-              aria-busy={isSaving}
+              aria-busy={continuing}
               className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
               <div className="flex items-center justify-center gap-2">
-                {isSaving ? (
+                {continuing ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Saving…</span>
+                    <span>Please wait...</span>
                   </>
                 ) : (
                   <>
