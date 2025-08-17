@@ -15,12 +15,19 @@ const supabase = createClient(
   { auth: { persistSession: false } }
 );
 
-// Safe prompt sanitization function (same as in generate-preview-images)
+// Brand-safe and non-violent prompt sanitization function
 function sanitizePrompt(p: string) {
+  // Remove brand names and violent/theft wording
+  let sanitized = p
+    .replace(/\b(spider-man|spiderman|marvel|dc|disney|pixar|nintendo|sony|microsoft|apple|google|amazon|netflix|youtube|facebook|instagram|twitter|x|tiktok)\b/gi, 'hero')
+    .replace(/\b(thief|steal|stealing|robbery|burglary|theft|grab|grabbing|purse|wallet|phone|jewelry)\b/gi, 'person')
+    .replace(/\b(violence|violent|fight|fighting|attack|attacking|punch|punching|kick|kicking|weapon|gun|knife)\b/gi, 'action')
+    .replace(/\b(mask|masked|hood|hooded)\b/gi, 'costume');
+  
   return [
-    "Family-friendly, safe-for-work, no nudity, no violence, no sensitive content.",
-    "Uplifting, wholesome, suitable for all ages.",
-    p
+    "Family-friendly, safe-for-work, no nudity, no violence, no sensitive content, no brands.",
+    "Uplifting, wholesome, suitable for all ages, playful comic style.",
+    sanitized
   ].join(" ");
 }
 

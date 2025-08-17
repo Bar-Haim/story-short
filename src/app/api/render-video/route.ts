@@ -12,33 +12,95 @@ const execAsync = promisify(exec);
 // Job locking mechanism to prevent duplicate renders
 const activeRenders = new Map<string, { startedAt: Date; status: 'rendering' | 'completed' | 'failed' }>();
 
-// Cross-platform FFmpeg path normalization for subtitles filter
-function ffmpegSubPath(p: string): string {
-  // Use forward slashes for FFmpeg
-  let s = p.replace(/\\/g, "/");
-  if (process.platform === "win32") {
-    // Escape the drive colon so the filter doesn't treat it as option separator
-    s = s.replace(/^([A-Za-z]):/, "$1\\:"); // C\:/Users/...
-    // IMPORTANT: do NOT wrap with double-quotes inside the -vf string
-    // We'll pass it as: subtitles=filename=C\:/Users/.../captions.srt
-  }
-  return s;
+// Windows-safe path escaping for subtitles filter
+function escapeSrtPathForFilter(p: string): string {
+  // Windows-safe for subtitles filter: backslashes -> forward slashes, escape drive colon
+  return p.replace(/\\/g, '/').replace(':', '\\:');
 }
 
 // Build video filter strings
-const baseVf = [
-  "scale=1080:1920:force_original_aspect_ratio=decrease",
-  "pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black",
-  "zoompan=z='min(zoom+0.0015,1.2)':d=125:x='iw/2-(iw/zoom/2)+sin(t*0.3)*12':y='ih/2-(ih/zoom/2)+cos(t*0.2)*10':s=1080x1920",
-];
-
-function makeVfWithSubs(captionsPath: string): string {
-  const subArg = `subtitles=filename=${ffmpegSubPath(captionsPath)}:force_style='FontSize=20,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,BorderStyle=1,Outline=1'`;
-  return [...baseVf, subArg].join(",");
+function buildVideoFilter(includeSubtitles: boolean, srtPath?: string): string {
+  const vfParts = [
+    "scale=1080:1920:force_original_aspect_ratio=decrease",
+    "pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black",
+    "zoompan=z='min(zoom+0.0015,1.2)':d=125:x='iw/2-(iw/zoom/2)+sin(t*0.3)*12':y='ih/2-(ih/zoom/2)+cos(t*0.2)*10':s=1080x1920",
+  ];
+  
+  if (includeSubtitles && srtPath) {
+    const srt = escapeSrtPathForFilter(srtPath);
+    vfParts.push(
+      `subtitles=filename='${srt}':charenc=UTF-8:force_style='FontSize=20,PrimaryColour=&HFFFFFF,OutlineColour=&H000000,BorderStyle=1,Outline=1'`
+    );
+  }
+  
+  return vfParts.join(',');
 }
 
-function makeVfNoSubs(): string {
-  return baseVf.join(",");
+// Build FFmpeg arguments with proper ordering
+function buildFfmpegArgs({ imagesTxt, audioMp3, outMp4, includeSubtitles, srtPath }: {
+  imagesTxt: string; 
+  audioMp3: string; 
+  outMp4: string; 
+  includeSubtitles: boolean; 
+  srtPath?: string;
+}): string[] {
+  const vf = buildVideoFilter(includeSubtitles, srtPath);
+  
+  // ✅ Order matters: first all inputs (-i ... -i ...), then -vf, then output
+  return [
+    "-y",
+    "-f", "concat", "-safe", "0", "-i", imagesTxt,
+    "-i", audioMp3,
+    "-vf", vf,
+    "-c:v", "libx264", "-preset", "fast", "-crf", "23",
+    "-c:a", "aac", "-b:a", "128k",
+    "-shortest", "-movflags", "+faststart",
+    outMp4,
+  ];
+}
+
+// Graceful fallback if subtitle burn fails
+async function renderWithFallback(ctx: {
+  imagesTxt: string; 
+  audioMp3: string; 
+  outMp4: string; 
+  srtPath?: string;
+}): Promise<{ burnedSubs: boolean }> {
+  const tryArgs = (withSubs: boolean) => buildFfmpegArgs({ ...ctx, includeSubtitles: withSubs });
+
+  try {
+    // Log the exact FFmpeg command for debugging
+    if (process.env.NODE_ENV !== 'production') {
+      console.log("[ffmpeg] args:", tryArgs(Boolean(ctx.srtPath)).join(' '));
+    }
+    
+    await execAsync("ffmpeg", tryArgs(Boolean(ctx.srtPath)), { 
+      timeout: 600000, // 10 minute timeout
+      windowsHide: true 
+    });
+  } catch (err: any) {
+    const msg = String(err?.stderr || err?.message || "");
+    console.warn(`⚠️ FFmpeg with subtitles failed:`, msg);
+    
+    // Retry without subtitles if filter/path fails
+    if (/subtitles|Option vf|Error opening input files/i.test(msg)) {
+      console.log(`🔄 Retrying FFmpeg without subtitles...`);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("[ffmpeg] fallback args:", tryArgs(false).join(' '));
+      }
+      
+      await execAsync("ffmpeg", tryArgs(false), { 
+        timeout: 600000, // 10 minute timeout
+        windowsHide: true 
+      });
+      
+      return { burnedSubs: false };
+    }
+    throw err;
+  }
+  
+  return { burnedSubs: Boolean(ctx.srtPath) };
 }
 
 // Convert VTT to SRT format
@@ -186,69 +248,19 @@ async function renderVideoInBackground(videoId: string, force: boolean = false) 
 
     await VideoService.updateVideo(videoId, { render_progress: 50 });
 
-    // Step 5: Execute FFmpeg with cross-platform subtitles handling
+    // Step 5: Execute FFmpeg with proper argument ordering and fallback
     console.log(`🎬 [${videoId}] Starting FFmpeg rendering...`);
     const outputPath = path.join(tempDir, 'final_video.mp4');
     
-    // Build FFmpeg command with proper path handling
-    const argsCommon = [
-      "-y",
-      "-f", "concat", "-safe", "0", "-i", imageListPath,
-      "-i", audioPath,
-      "-c:v", "libx264", "-preset", "fast", "-crf", "23",
-      "-c:a", "aac", "-b:a", "128k",
-      "-shortest", "-movflags", "+faststart",
-      outputPath
-    ];
-
-    // Try with subtitles first, fallback to no subtitles if it fails
-    if (captionsPath) {
-      console.log(`📝 [${videoId}] Attempting to render with subtitles...`);
-      try {
-        const vfWithSubs = makeVfWithSubs(captionsPath);
-        console.log(`🔧 [${videoId}] Video filter with subtitles:`, vfWithSubs);
-        
-        const ffmpegCommand = `ffmpeg -sub_charenc UTF-8 -vf "${vfWithSubs}" ${argsCommon.join(' ')}`;
-        console.log(`🚀 [${videoId}] Executing FFmpeg with subtitles...`);
-        
-        await execAsync(ffmpegCommand, { 
-          timeout: 600000, // 10 minute timeout
-          shell: process.platform === 'win32' ? 'cmd.exe' : '/bin/bash'
-        });
-        
-        console.log(`✅ [${videoId}] FFmpeg with subtitles completed successfully`);
-      } catch (subtitleError) {
-        console.warn(`⚠️ [${videoId}] Subtitles overlay failed, retrying without subtitles:`, subtitleError);
-        
-        // Fallback: render without subtitles
-        const vfNoSubs = makeVfNoSubs();
-        console.log(`🔧 [${videoId}] Video filter without subtitles:`, vfNoSubs);
-        
-        const ffmpegCommand = `ffmpeg -vf "${vfNoSubs}" ${argsCommon.join(' ')}`;
-        console.log(`🚀 [${videoId}] Executing FFmpeg without subtitles...`);
-        
-        await execAsync(ffmpegCommand, { 
-          timeout: 600000, // 10 minute timeout
-          shell: process.platform === 'win32' ? 'cmd.exe' : '/bin/bash'
-        });
-        
-        console.log(`✅ [${videoId}] FFmpeg without subtitles completed successfully`);
-      }
-    } else {
-      // No captions available, render without subtitles
-      const vfNoSubs = makeVfNoSubs();
-      console.log(`🔧 [${videoId}] Video filter without subtitles:`, vfNoSubs);
-      
-      const ffmpegCommand = `ffmpeg -vf "${vfNoSubs}" ${argsCommon.join(' ')}`;
-      console.log(`🚀 [${videoId}] Executing FFmpeg without subtitles...`);
-      
-      await execAsync(ffmpegCommand, { 
-        timeout: 600000, // 10 minute timeout
-        shell: process.platform === 'win32' ? 'cmd.exe' : '/bin/bash'
-      });
-      
-      console.log(`✅ [${videoId}] FFmpeg without subtitles completed successfully`);
-    }
+    // Use the new renderWithFallback function for robust subtitle handling
+    const { burnedSubs } = await renderWithFallback({
+      imagesTxt: imageListPath,
+      audioMp3: audioPath,
+      outMp4: outputPath,
+      srtPath: captionsPath
+    });
+    
+    console.log(`✅ [${videoId}] FFmpeg completed successfully. Subtitles burned: ${burnedSubs}`);
 
     await VideoService.updateVideo(videoId, { render_progress: 80 });
 

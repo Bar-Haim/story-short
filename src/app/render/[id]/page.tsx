@@ -13,6 +13,7 @@ export default function RenderPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Track elapsed time for rendering
   useEffect(() => {
@@ -72,9 +73,10 @@ export default function RenderPage() {
     const triggerRendering = async () => {
       // Only trigger if assets are ready and we're not already rendering/completed
       if (videoStatus.ready?.images && videoStatus.ready?.audio && videoStatus.ready?.captions &&
-          !['rendering', 'completed'].includes(videoStatus.status)) {
+          !['rendering', 'completed'].includes(videoStatus.status) && !isSubmitting) {
         
         console.log('🚀 Assets ready, triggering video rendering...');
+        setIsSubmitting(true);
         
         try {
           const response = await fetch('/api/render-video', {
@@ -91,12 +93,14 @@ export default function RenderPage() {
           }
         } catch (error) {
           console.error('❌ Error triggering rendering:', error);
+        } finally {
+          setIsSubmitting(false);
         }
       }
     };
 
     triggerRendering();
-  }, [videoStatus, id]);
+  }, [videoStatus, id, isSubmitting]);
 
   const handleViewVideo = () => {
     router.push(`/video/${id}`);
@@ -229,6 +233,13 @@ export default function RenderPage() {
                 {isCompleted ? 'Completed' : `Elapsed time: ${formatTime(elapsedTime)}`}
               </div>
             )}
+            
+            {/* Render Status Indicator */}
+            {videoStatus.status === 'rendering' && (
+              <div className="mt-2 text-sm text-blue-600 font-medium">
+                🎬 Rendering in progress... Please wait
+              </div>
+            )}
           </div>
 
           {/* Rendering Progress Indicator */}
@@ -306,6 +317,38 @@ export default function RenderPage() {
             >
               Back to Assets
             </button>
+            
+            {/* Manual Render Button - only show when not already rendering */}
+            {!isRendering && videoStatus.status !== 'rendering' && (
+              <button
+                onClick={async () => {
+                  if (isSubmitting) return;
+                  setIsSubmitting(true);
+                  try {
+                    const response = await fetch('/api/render-video', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ videoId: id })
+                    });
+                    if (response.ok) {
+                      console.log('✅ Manual render triggered');
+                    }
+                  } catch (error) {
+                    console.error('❌ Manual render failed:', error);
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+                disabled={isSubmitting || !videoStatus.ready?.images || !videoStatus.ready?.audio}
+                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                  isSubmitting || !videoStatus.ready?.images || !videoStatus.ready?.audio
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                {isSubmitting ? 'Starting Render...' : 'Render Video'}
+              </button>
+            )}
             
             <button
               onClick={handleViewVideo}
