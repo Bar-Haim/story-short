@@ -1,0 +1,12 @@
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\afc7a3a5-50ec-4f24-9247-099c9eab3a89\temp\scene_1.png'
+duration 5
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\afc7a3a5-50ec-4f24-9247-099c9eab3a89\temp\scene_2.png'
+duration 5
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\afc7a3a5-50ec-4f24-9247-099c9eab3a89\temp\scene_3.png'
+duration 5
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\afc7a3a5-50ec-4f24-9247-099c9eab3a89\temp\scene_4.png'
+duration 5
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\afc7a3a5-50ec-4f24-9247-099c9eab3a89\temp\scene_5.png'
+duration 5
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\afc7a3a5-50ec-4f24-9247-099c9eab3a89\temp\scene_6.png'
+duration 5

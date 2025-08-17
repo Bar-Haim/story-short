@@ -7,7 +7,7 @@ const testScenarios = [
     name: 'Backend Error Handling Fixes',
     features: [
       'Fixed errorMessage.includes crash with type validation',
-      'Enhanced Stability AI billing error handling',
+      'Enhanced Leonardo AI billing error handling',
       'Added retry logic for failed image generation',
       'Real-time image progress tracking'
     ]

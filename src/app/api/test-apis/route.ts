@@ -1,18 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+
+interface ApiTestResult {
+  name: string;
+  status: 'success' | 'error' | 'not_configured';
+  message: string;
+  details?: Record<string, unknown>;
+}
+
+interface TestResponse {
+  tests: ApiTestResult[];
+  summary: {
+    total: number;
+    passed: number;
+    failed: number;
+  };
+}
 
 export async function GET() {
-  const results = {
-    timestamp: new Date().toISOString(),
-    environment: {
-      openRouterConfigured: !!process.env.OPENROUTER_API_KEY,
-      elevenLabsConfigured: !!process.env.ELEVENLABS_API_KEY,
-      supabaseConfigured: !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+  const results: TestResponse = {
+    tests: [],
+    summary: {
+      total: 0,
+      passed: 0,
+      failed: 0,
     },
-    apiTests: {
-      openRouter: null as any,
-      elevenLabs: null as any,
-      supabase: null as any,
-    }
   };
 
   // Test OpenRouter API (for script and image generation)
@@ -27,28 +38,38 @@ export async function GET() {
       
       if (response.ok) {
         const data = await response.json();
-        results.apiTests.openRouter = {
+        results.tests.push({
+          name: 'OpenRouter API',
           status: 'success',
           message: 'OpenRouter API is working',
-          models: data.data?.length || 0,
-        };
+          details: {
+            models: data.data?.length || 0,
+          },
+        });
+        results.summary.passed++;
       } else {
-        results.apiTests.openRouter = {
+        results.tests.push({
+          name: 'OpenRouter API',
           status: 'error',
           message: `OpenRouter API error: ${response.status} ${response.statusText}`,
-        };
+        });
+        results.summary.failed++;
       }
     } catch (error) {
-      results.apiTests.openRouter = {
+      results.tests.push({
+        name: 'OpenRouter API',
         status: 'error',
         message: `OpenRouter API test failed: ${error}`,
-      };
+      });
+      results.summary.failed++;
     }
   } else {
-    results.apiTests.openRouter = {
+    results.tests.push({
+      name: 'OpenRouter API',
       status: 'not_configured',
       message: 'OPENROUTER_API_KEY not found in environment variables',
-    };
+    });
+    results.summary.total++;
   }
 
   // Test ElevenLabs API
@@ -63,64 +84,79 @@ export async function GET() {
       
       if (response.ok) {
         const data = await response.json();
-        results.apiTests.elevenLabs = {
+        results.tests.push({
+          name: 'ElevenLabs API',
           status: 'success',
           message: 'ElevenLabs API is working',
-          voices: data.voices?.length || 0,
-        };
+          details: {
+            voices: data.voices?.length || 0,
+          },
+        });
+        results.summary.passed++;
       } else {
-        results.apiTests.elevenLabs = {
+        results.tests.push({
+          name: 'ElevenLabs API',
           status: 'error',
           message: `ElevenLabs API error: ${response.status} ${response.statusText}`,
-        };
+        });
+        results.summary.failed++;
       }
     } catch (error) {
-      results.apiTests.elevenLabs = {
+      results.tests.push({
+        name: 'ElevenLabs API',
         status: 'error',
         message: `ElevenLabs API test failed: ${error}`,
-      };
+      });
+      results.summary.failed++;
     }
   } else {
-    results.apiTests.elevenLabs = {
+    results.tests.push({
+      name: 'ElevenLabs API',
       status: 'not_configured',
       message: 'ELEVENLABS_API_KEY not found in environment variables',
-    };
+    });
+    results.summary.total++;
   }
 
   // Test Supabase
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     try {
       console.log('🧪 Testing Supabase connection...');
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      );
+      const { sbServer } = await import('@/lib/supabase-server');
+      const supabase = sbServer();
       
       const { data, error } = await supabase.from('videos').select('count').limit(1);
       
       if (error) {
-        results.apiTests.supabase = {
+        results.tests.push({
+          name: 'Supabase',
           status: 'error',
           message: `Supabase connection error: ${error.message}`,
-        };
+        });
+        results.summary.failed++;
       } else {
-        results.apiTests.supabase = {
+        results.tests.push({
+          name: 'Supabase',
           status: 'success',
           message: 'Supabase connection is working',
-        };
+        });
+        results.summary.passed++;
       }
     } catch (error) {
-      results.apiTests.supabase = {
+      results.tests.push({
+        name: 'Supabase',
         status: 'error',
         message: `Supabase test failed: ${error}`,
-      };
+      });
+      results.summary.failed++;
     }
   } else {
-    results.apiTests.supabase = {
+    results.tests.push({
+      name: 'Supabase',
       status: 'not_configured',
       message: 'Supabase environment variables not found',
-    };
+    });
+    results.summary.total++;
   }
 
   return NextResponse.json(results);

@@ -1,0 +1,45 @@
+PLACEHOLDER IMAGE SETUP
+
+This file explains how to create the placeholder.png image for the StoryShort application.
+
+REQUIREMENTS:
+- File name: placeholder.png
+- Location: public/placeholder.png (same directory as this file)
+- Format: PNG image
+- Size: 1024x1024 pixels (or similar square dimensions)
+- Content: Simple, professional placeholder image
+
+CREATION OPTIONS:
+
+1. ONLINE IMAGE GENERATOR:
+   - Visit: https://placeholder.com/
+   - Generate: 1024x1024 placeholder
+   - Download and save as "placeholder.png"
+
+2. DESIGN SOFTWARE:
+   - Create a 1024x1024 canvas
+   - Fill with a neutral color (e.g., #f0f0f0)
+   - Add text: "Image Not Available" or "Placeholder"
+   - Export as PNG
+
+3. SIMPLE COLOR BLOCK:
+   - Create a 1024x1024 image
+   - Fill with a solid color (e.g., light gray #cccccc)
+   - Save as PNG
+
+4. AI IMAGE GENERATOR:
+   - Use DALL-E, Midjourney, or similar
+   - Prompt: "Simple placeholder image, 1024x1024, neutral background, professional"
+   - Download and save as "placeholder.png"
+
+PURPOSE:
+This placeholder image is used when:
+- DALL-E 3 image generation fails
+- DALL-E 2 fallback also fails
+- Content policy violations occur
+- Network or API errors happen
+
+The placeholder ensures the video generation pipeline can continue even when image generation fails, preventing the entire process from stopping due to individual scene failures.
+
+DELETE THIS FILE:
+Once you've created placeholder.png, you can delete this .txt file. 

@@ -2,18 +2,44 @@
   "name": "storyshort",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "set PORT=4000 && next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "render:tts": "ts-node scripts/render-tts.ts",
+    "preview-latest": "ts-node scripts/preview-latest.ts",
+    "diagnose:images": "node scripts/diagnose-images-txt.js",
+    "generate:images-txt": "node scripts/generate-images-txt.js",
+    "fix:images-txt": "node scripts/fix-images-txt.js",
+    "find:videos": "node scripts/find-valid-videos.js",
+    "render:job": "node scripts/render-job.js",
+    "test:render": "node scripts/test-render-pipeline.js",
+    "batch:render": "node scripts/batch-render.js",
+    "render:validated": "node scripts/render-validated.js",
+    "process:latest": "npx tsx scripts/process-latest-video.ts",
+    "fix:storyboard": "npx tsx scripts/fix-storyboard-images.ts",
+    "test:fallback": "npx tsx scripts/test-fallback-mechanism.ts",
+    "process:one": "node scripts/process-video.cjs",
+    "test:process": "node scripts/test-process-video.js",
+    "test:auto": "node scripts/test-auto-processing.cjs",
+    "setup:buckets": "node scripts/setup-buckets.cjs",
+    "create-buckets": "node scripts/create-buckets.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.53.0",
+    "axios": "^1.11.0",
     "dotenv": "^17.2.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "form-data": "^4.0.4",
+    "framer-motion": "^12.23.12",
     "next": "15.4.5",
+    "node-fetch": "^3.3.2",
+    "openai": "^5.11.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "replicate": "^1.0.1",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
@@ -28,5 +54,18 @@
     "tailwindcss": "^4",
     "tsx": "^4.20.3",
     "typescript": "^5"
-  }
+  },
+  "description": "🎬 **StoryShort** is an AI-powered video generation platform that transforms text into engaging short-form videos with AI-generated images, voiceovers, and captions.",
+  "main": "auto-fix-supabase.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bar-Haim/story-short.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bar-Haim/story-short/issues"
+  },
+  "homepage": "https://github.com/Bar-Haim/story-short#readme"
 }

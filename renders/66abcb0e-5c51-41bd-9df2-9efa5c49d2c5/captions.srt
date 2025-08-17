@@ -1,0 +1,20 @@
+1
+00:00:00,000 --> 00:00:14,000
+HOOK: Behold a world bathed in pure joy, where golden retrievers and their tiny puppies leap through flower-filled fields under a golden sun
+
+2
+00:00:14,000 --> 00:00:26,200
+BODY: They've spread their infectious happiness, filling the bustling streets of New York City with laughter and delight
+
+3
+00:00:26,200 --> 00:00:36,900
+Their boundless energy has even reached the serene beaches of Hawaii, painting a picture of hope and unity
+
+4
+00:00:36,900 --> 00:00:46,800
+CTA: Embrace their spirit, let their joy inspire us to create a world filled with love and harmony
+
+5
+00:00:46,800 --> 00:00:50,400
+Be the change, spread the happiness
+

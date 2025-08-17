@@ -1,0 +1,2 @@
+file 'scene_1.png'
+duration 3.0 

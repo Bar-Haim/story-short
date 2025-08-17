@@ -1,0 +1,5 @@
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\scene-01.jpg'
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\scene-02.jpg'
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\scene-03.jpg'
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\scene-04.jpg'
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\scene-05.jpg'

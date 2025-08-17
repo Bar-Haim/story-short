@@ -1,0 +1,806 @@
+ffmpeg started on 2025-08-10 at 10:15:36
+Report written to "ffmpeg-20250810-101536.log"
+Log level: 48
+Command line:
+ffmpeg -y -report -f concat -safe 0 -i "C:\\Users\\haim4\\Desktop\\StoryShort MVP Development Plan\\storyshort\\renders\\41108c8d-8066-432c-b988-8a187b53a3a2\\temp\\images.txt" -i "C:\\Users\\haim4\\Desktop\\StoryShort MVP Development Plan\\storyshort\\renders\\41108c8d-8066-432c-b988-8a187b53a3a2\\temp\\audio.mp3" -c:v libx264 -preset fast -crf 23 -c:a aac -b:a 128k -shortest -vf "subtitles=filename='C\\:\\\\Users\\\\haim4\\\\Desktop\\\\StoryShort MVP Development Plan\\\\storyshort\\\\renders\\\\41108c8d-8066-432c-b988-8a187b53a3a2\\\\temp\\\\captions.srt':force_style='FontSize=24,PrimaryColour=&Hffffff,OutlineColour=&H000000,BackColour=&H000000,Bold=1'" -r 30 "C:\\Users\\haim4\\Desktop\\StoryShort MVP Development Plan\\storyshort\\renders\\41108c8d-8066-432c-b988-8a187b53a3a2\\temp\\output.mp4"
+ffmpeg version 7.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2025 the FFmpeg developers
+  built with gcc 14.2.0 (Rev1, Built by MSYS2 project)
+  configuration: --enable-gpl --enable-version3 --enable-static --disable-w32threads --disable-autodetect --enable-fontconfig --enable-iconv --enable-gnutls --enable-libxml2 --enable-gmp --enable-bzlib --enable-lzma --enable-zlib --enable-libsrt --enable-libssh --enable-libzmq --enable-avisynth --enable-sdl2 --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxvid --enable-libaom --enable-libopenjpeg --enable-libvpx --enable-mediafoundation --enable-libass --enable-libfreetype --enable-libfribidi --enable-libharfbuzz --enable-libvidstab --enable-libvmaf --enable-libzimg --enable-amf --enable-cuda-llvm --enable-cuvid --enable-dxva2 --enable-d3d11va --enable-d3d12va --enable-ffnvcodec --enable-libvpl --enable-nvdec --enable-nvenc --enable-vaapi --enable-libgme --enable-libopenmpt --enable-libopencore-amrwb --enable-libmp3lame --enable-libtheora --enable-libvo-amrwbenc --enable-libgsm --enable-libopencore-amrnb --enable-libopus --enable-libspeex --enable-libvorbis --enable-librubberband
+  libavutil      59. 39.100 / 59. 39.100
+  libavcodec     61. 19.101 / 61. 19.101
+  libavformat    61.  7.100 / 61.  7.100
+  libavdevice    61.  3.100 / 61.  3.100
+  libavfilter    10.  4.100 / 10.  4.100
+  libswscale      8.  3.100 /  8.  3.100
+  libswresample   5.  3.100 /  5.  3.100
+  libpostproc    58.  3.100 / 58.  3.100
+Splitting the commandline.
+Reading option '-y' ... matched as option 'y' (overwrite output files) with argument '1'.
+Reading option '-report' ... matched as option 'report' (generate a report) with argument '1'.
+Reading option '-f' ... matched as option 'f' (force container format (auto-detected otherwise)) with argument 'concat'.
+Reading option '-safe' ... matched as AVOption 'safe' with argument '0'.
+Reading option '-i' ... matched as input url with argument 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\images.txt'.
+Reading option '-i' ... matched as input url with argument 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\audio.mp3'.
+Reading option '-c:v' ... matched as option 'c' (select encoder/decoder ('copy' to copy stream without reencoding)) with argument 'libx264'.
+Reading option '-preset' ... matched as AVOption 'preset' with argument 'fast'.
+Reading option '-crf' ... matched as AVOption 'crf' with argument '23'.
+Reading option '-c:a' ... matched as option 'c' (select encoder/decoder ('copy' to copy stream without reencoding)) with argument 'aac'.
+Reading option '-b:a' ... matched as option 'b' (video bitrate (please use -b:v)) with argument '128k'.
+Reading option '-shortest' ... matched as option 'shortest' (finish encoding within shortest input) with argument '1'.
+Reading option '-vf' ... matched as option 'vf' (alias for -filter:v (apply filters to video streams)) with argument 'subtitles=filename='C\:\\Users\\haim4\\Desktop\\StoryShort MVP Development Plan\\storyshort\\renders\\41108c8d-8066-432c-b988-8a187b53a3a2\\temp\\captions.srt':force_style='FontSize=24,PrimaryColour=&Hffffff,OutlineColour=&H000000,BackColour=&H000000,Bold=1''.
+Reading option '-r' ... matched as option 'r' (override input framerate/convert to given output framerate (Hz value, fraction or abbreviation)) with argument '30'.
+Reading option 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\output.mp4' ... matched as output url.
+Finished splitting the commandline.
+Parsing a group of options: global .
+Applying option y (overwrite output files) with argument 1.
+Applying option report (generate a report) with argument 1.
+Successfully parsed a group of options.
+Parsing a group of options: input url C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\images.txt.
+Applying option f (force container format (auto-detected otherwise)) with argument concat.
+Successfully parsed a group of options.
+Opening an input file: C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\images.txt.
+[concat @ 000002151080fe00] Opening 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\images.txt' for reading
+[file @ 0000021510810cc0] Setting default whitelist 'file,crypto,data'
+[AVFormatContext @ 0000021510810e00] Opening 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\scene-01.jpg' for reading
+[png_pipe @ 0000021510810e00] Format png_pipe probed with size=2048 and score=99
+[png_pipe @ 0000021510810e00] Before avformat_find_stream_info() pos: 0 bytes read:32768 seeks:0 nb_streams:1
+[png_pipe @ 0000021510810e00] After avformat_find_stream_info() pos: 2840264 bytes read:2840264 seeks:0 frames:1
+[concat @ 000002151080fe00] Before avformat_find_stream_info() pos: 680 bytes read:680 seeks:0 nb_streams:1
+[concat @ 000002151080fe00] file:0 stream:0 pts:0 pts_time:0 dts:0 dts_time:0 -> pts:0 pts_time:0 dts:0 dts_time:0
+[concat @ 000002151080fe00] All info found
+[concat @ 000002151080fe00] After avformat_find_stream_info() pos: 680 bytes read:680 seeks:0 frames:1
+Input #0, concat, from 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\images.txt':
+  Duration: N/A, start: 0.000000, bitrate: N/A
+  Stream #0:0, 1, 1/25: Video: png, rgb24(pc, gbr/unknown/unknown), 1024x1792, 25 fps, 25 tbr, 25 tbn
+Successfully opened the file.
+Parsing a group of options: input url C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\audio.mp3.
+Successfully parsed a group of options.
+Opening an input file: C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\audio.mp3.
+[AVFormatContext @ 0000021510824000] Opening 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\audio.mp3' for reading
+[file @ 0000021510824500] Setting default whitelist 'file,crypto,data'
+[mp3 @ 0000021510824000] Format mp3 probed with size=4096 and score=51
+id3v2 ver:4 flags:00 len:35
+[mp3 @ 0000021510824000] Skipping 0 bytes of junk at 45.
+[mp3 @ 0000021510824000] Before avformat_find_stream_info() pos: 45 bytes read:32768 seeks:0 nb_streams:1
+[mp3 @ 0000021510824000] All info found
+[mp3 @ 0000021510824000] Estimating duration from bitrate, this may be inaccurate
+[mp3 @ 0000021510824000] After avformat_find_stream_info() pos: 21549 bytes read:32768 seeks:0 frames:50
+Input #1, mp3, from 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\audio.mp3':
+  Metadata:
+    encoder         : Lavf60.16.100
+  Duration: 00:00:20.14, start: 0.000000, bitrate: 128 kb/s
+  Stream #1:0, 50, 1/14112000: Audio: mp3 (mp3float), 44100 Hz, mono, fltp, 128 kb/s
+Successfully opened the file.
+Parsing a group of options: output url C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\output.mp4.
+Applying option c:v (select encoder/decoder ('copy' to copy stream without reencoding)) with argument libx264.
+Applying option c:a (select encoder/decoder ('copy' to copy stream without reencoding)) with argument aac.
+Applying option b:a (video bitrate (please use -b:v)) with argument 128k.
+Applying option shortest (finish encoding within shortest input) with argument 1.
+Applying option vf (alias for -filter:v (apply filters to video streams)) with argument subtitles=filename='C\:\\Users\\haim4\\Desktop\\StoryShort MVP Development Plan\\storyshort\\renders\\41108c8d-8066-432c-b988-8a187b53a3a2\\temp\\captions.srt':force_style='FontSize=24,PrimaryColour=&Hffffff,OutlineColour=&H000000,BackColour=&H000000,Bold=1'.
+Applying option r (override input framerate/convert to given output framerate (Hz value, fraction or abbreviation)) with argument 30.
+Successfully parsed a group of options.
+Opening an output file: C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\output.mp4.
+[out#0/mp4 @ 0000021510839980] No explicit maps, mapping streams automatically...
+[vost#0:0/libx264 @ 0000021510826180] Created video stream from input stream 0:0
+[AVFilterGraph @ 0000021510838c80] Setting 'filename' to value 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\captions.srt'
+[AVFilterGraph @ 0000021510838c80] Setting 'force_style' to value 'FontSize=24,PrimaryColour=&Hffffff,OutlineColour=&H000000,BackColour=&H000000,Bold=1'
+[Parsed_subtitles_0 @ 0000021510842440] libass API version: 0x1703020
+[Parsed_subtitles_0 @ 0000021510842440] libass source: commit: 0.17.3-79-g1b699559025185e34d21a24cac477ca360cb917d
+[Parsed_subtitles_0 @ 0000021510842440] Raster: FreeType 2.13.3
+[Parsed_subtitles_0 @ 0000021510842440] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 10.4.0 (COMPLEX)
+[Parsed_subtitles_0 @ 0000021510842440] Initialized
+[AVFormatContext @ 0000021510845100] Opening 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\captions.srt' for reading
+[file @ 00000215108453c0] Setting default whitelist 'file,crypto,data'
+[srt @ 0000021510845100] Format srt probed with size=2048 and score=100
+[srt @ 0000021510845100] Before avformat_find_stream_info() pos: 167 bytes read:167 seeks:0 nb_streams:1
+[srt @ 0000021510845100] All info found
+[srt @ 0000021510845100] After avformat_find_stream_info() pos: 167 bytes read:167 seeks:0 frames:0
+[Parsed_subtitles_0 @ 0000021510842440] Using font provider directwrite (with GDI)
+[Parsed_subtitles_0 @ 0000021510842440] Event: [Script Info]
+; Script generated by FFmpeg/Lavc61.19.101
+ScriptType: v4.00+
+PlayResX: 384
+PlayResY: 288
+ScaledBorderAndShadow: yes
+YCbCr Matrix: None
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,16,&Hffffff,&Hffffff,&H0,&H0,0,0,0,0,100,100,0,0,1,1,0,2,10,10,10,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+[Parsed_subtitles_0 @ 0000021510842440] 
+[Parsed_subtitles_0 @ 0000021510842440] Style format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+[Parsed_subtitles_0 @ 0000021510842440] [00000215108426b0] Style: Default,Arial,16,&Hffffff,&Hffffff,&H0,&H0,0,0,0,0,100,100,0,0,1,1,0,2,10,10,10,1
+[Parsed_subtitles_0 @ 0000021510842440] Event format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+[Parsed_subtitles_0 @ 0000021510842440] Event at 0, +4000: 0,0,Default,,0,0,0,,HOOK: Immerse in an ultra-realistic journey of golden retrievers ruling
+[Parsed_subtitles_0 @ 0000021510842440] Event at 4000, +4000: 1,0,Default,,0,0,0,,the world with joy and love.
+[AVIOContext @ 0000021510845500] Statistics: 167 bytes read, 0 seeks
+detected 20 logical cores
+[aost#0:1/aac @ 0000021510877800] Created audio stream from input stream 1:0
+[file @ 0000021510c60d40] Setting default whitelist 'file,crypto,data'
+Successfully opened the file.
+Stream mapping:
+  Stream #0:0 -> #0:0 (png (native) -> h264 (libx264))
+  Stream #1:0 -> #0:1 (mp3 (mp3float) -> aac (native))
+[vost#0:0/libx264 @ 0000021510826180] Starting thread...
+[aost#0:1/aac @ 0000021510877800] Starting thread...
+[vf#0:0 @ 0000021510827440] Starting thread...
+[af#0:1 @ 0000021510826f00] Starting thread...
+[vist#0:0/png @ 0000021510829780] [dec:png @ 0000021510849e00] Starting thread...
+[aist#1:0/mp3 @ 0000021510811a80] [dec:mp3float @ 0000021510877e80] Starting thread...
+[in#0/concat @ 0000021510817a80] Starting thread...
+[in#1/mp3 @ 0000021510817380] Starting thread...
+Press [q] to stop, [?] for help
+[AVIOContext @ 0000021510829040] Statistics: 2840264 bytes read, 0 seeks
+[AVFormatContext @ 0000021510811ec0] Opening 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\scene-02.jpg' for reading
+[graph_-1_in_1:0 @ 0000021510874f40] Setting 'time_base' to value '1/44100'
+[graph_-1_in_1:0 @ 0000021510874f40] Setting 'sample_rate' to value '44100'
+[graph_-1_in_1:0 @ 0000021510874f40] Setting 'sample_fmt' to value 'fltp'
+[graph_-1_in_1:0 @ 0000021510874f40] Setting 'channel_layout' to value 'mono'
+[graph_-1_in_1:0 @ 0000021510874f40] tb:1/44100 samplefmt:fltp samplerate:44100 chlayout:mono
+[format_out_#0:1 @ 0000021510828d40] Setting 'sample_fmts' to value 'fltp'
+[format_out_#0:1 @ 0000021510828d40] Setting 'sample_rates' to value '96000|88200|64000|48000|44100|32000|24000|22050|16000|12000|11025|8000|7350'
+[AVFilterGraph @ 000002151088ca80] query_formats: 4 queried, 6 merged, 3 already done, 0 delayed
+Transform tree:
+    mdct_fwd_float_c - type: mdct_float, len: 1024, factors[2]: [2, any], flags: [unaligned, out_of_place, fwd_only]
+        fft_sr_ns_float_avx2 - type: fft_float, len: 512, factor: 2, flags: [aligned, inplace, out_of_place, preshuf]
+Transform tree:
+    mdct_fwd_float_c - type: mdct_float, len: 128, factors[2]: [2, any], flags: [unaligned, out_of_place, fwd_only]
+        fft_sr_ns_float_avx2 - type: fft_float, len: 64, factor: 2, flags: [aligned, inplace, out_of_place, preshuf]
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.0261224
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.0522449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.0783673
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.10449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.130612
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.156735
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.182857
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.20898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.235102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.261224
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.287347
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.313469
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.339592
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.365714
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.391837
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.417959
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.444082
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.470204
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.496327
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.522449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.548571
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.574694
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.600816
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.626939
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.653061
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.679184
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.705306
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.731429
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.757551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.783673
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.809796
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.835918
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.862041
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.888163
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.914286
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.940408
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.966531
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 0.992653
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.018776
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.044898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.07102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.097143
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.123265
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.149388
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.17551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.201633
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.227755
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.253878
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.28
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.306122
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.332245
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.358367
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.38449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.410612
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.436735
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.462857
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.48898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.515102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.541224
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.567347
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.593469
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.619592
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.645714
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.671837
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.697959
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.724082
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.750204
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.776327
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.802449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.828571
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.854694
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.880816
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.906939
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.933061
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.959184
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 1.985306
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.011429
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.037551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.063673
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.089796
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.115918
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.142041
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.168163
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.194286
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.220408
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.246531
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.272653
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.298776
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.324898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.35102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.377143
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.403265
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.429388
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.45551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.481633
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.507755
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.533878
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.56
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.586122
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.612245
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.638367
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.66449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.690612
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.716735
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.742857
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.76898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.795102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.821224
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.847347
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.873469
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.899592
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.925714
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.951837
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 2.977959
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.004082
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.030204
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.056327
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.082449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.108571
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.134694
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.160816
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.186939
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.213061
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.239184
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.265306
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.291429
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.317551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.343673
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.369796
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.395918
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.422041
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.448163
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.474286
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.500408
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.526531
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.552653
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.578776
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.604898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.63102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.657143
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.683265
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.709388
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.73551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.761633
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.787755
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.813878
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.84
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.866122
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.892245
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.918367
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.94449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.970612
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 3.996735
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.022857
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.04898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.075102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.101224
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.127347
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.153469
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.179592
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.205714
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.231837
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.257959
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.284082
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.310204
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.336327
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.362449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.388571
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.414694
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.440816
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.466939
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.493061
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.519184
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.545306
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.571429
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.597551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.623673
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.649796
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.675918
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.702041
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.728163
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.754286
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.780408
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.806531
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.832653
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.858776
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.884898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.91102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.937143
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.963265
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 4.989388
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.01551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.041633
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.067755
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.093878
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.12
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.146122
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.172245
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.198367
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.22449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.250612
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.276735
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.302857
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.32898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.355102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.381224
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.407347
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.433469
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.459592
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.485714
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.511837
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.537959
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.564082
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.590204
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.616327
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.642449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.668571
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.694694
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.720816
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.746939
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.773061
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.799184
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.825306
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.851429
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.877551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.903673
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.929796
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.955918
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 5.982041
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.008163
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.034286
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.060408
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.086531
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.112653
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.138776
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.164898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.19102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.217143
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.243265
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.269388
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.29551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.321633
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.347755
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.373878
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.4
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.426122
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.452245
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.478367
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.50449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.530612
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.556735
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.582857
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.60898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.635102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.661224
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.687347
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.713469
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.739592
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.765714
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.791837
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.817959
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.844082
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.870204
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.896327
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.922449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.948571
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 6.974694
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.000816
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.026939
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.053061
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.079184
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.105306
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.131429
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.157551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.183673
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.209796
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.235918
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.262041
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.288163
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.314286
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.340408
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.366531
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.392653
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.418776
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.444898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.47102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.497143
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.523265
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.549388
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.57551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.601633
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.627755
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.653878
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.68
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.706122
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.732245
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.758367
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.78449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.810612
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.836735
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.862857
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.88898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.915102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.941224
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.967347
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 7.993469
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.019592
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.045714
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.071837
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.097959
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.124082
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.150204
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.176327
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.202449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.228571
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.254694
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.280816
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.306939
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.333061
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.359184
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.385306
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.411429
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.437551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.463673
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.489796
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.515918
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.542041
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.568163
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.594286
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.620408
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.646531
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.672653
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.698776
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.724898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.75102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.777143
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.803265
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.829388
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.85551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.881633
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.907755
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.933878
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.96
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 8.986122
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.012245
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.038367
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.06449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.090612
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.116735
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.142857
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.16898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.195102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.221224
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.247347
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.273469
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.299592
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.325714
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.351837
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.377959
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.404082
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.430204
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.456327
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.482449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.508571
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.534694
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.560816
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.586939
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.613061
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.639184
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.665306
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.691429
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.717551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.743673
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.769796
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.795918
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.822041
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.848163
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.874286
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.900408
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.926531
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.952653
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 9.978776
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.004898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.03102
+[out#0/mp4 @ 0000021510839980] sq: 0 overflow heardbeat NOPTS -> 0
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.057143
+[out#0/mp4 @ 0000021510839980] sq: 0 overflow heardbeat 0 -> 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.02322 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.0464399 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.0696599 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.0928798 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.1161 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.13932 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.16254 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.18576 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.20898 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.2322 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.25542 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.278639 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.301859 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.325079 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.348299 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.371519 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.394739 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.417959 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.441179 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.464399 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.487619 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.510839 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.534059 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.557279 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.580499 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.603719 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.626939 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.650159 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.673379 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.696599 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.719819 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.743039 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.766259 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.789478 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.812698 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.835918 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.859138 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.882358 queue head 0 ts 1
+[png_pipe @ 0000021510811ec0] Format png_pipe probed with size=2048 and score=99
+[png_pipe @ 0000021510811ec0] Before avformat_find_stream_info() pos: 0 bytes read:32768 seeks:0 nb_streams:1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.905578 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.928798 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.952018 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.975238 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: receive 1 ts 0.998458 queue head 0 ts 1
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.083265
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.109388
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.13551
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.161633
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.187755
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.213878
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.24
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.266122
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.292245
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.318367
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.34449
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.370612
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.396735
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.422857
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.44898
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.475102
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.501224
+[out#0/mp4 @ 0000021510839980] sq: send 1 ts 10.527347
+[png_pipe @ 0000021510811ec0] After avformat_find_stream_info() pos: 2569421 bytes read:2569421 seeks:0 frames:1
+[concat @ 000002151080fe00] file:1 stream:0 pts:0 pts_time:0 dts:0 dts_time:0 -> pts:-230584300921369 pts_time:-9223372036854.759766 dts:-230584300921369 dts_time:-9223372036854.759766
+[concat @ 000002151080fe00] DTS -230584300921369 < 0 out of order
+DTS -230584300921369, next:40000 st:0 invalid dropping
+PTS -230584300921369, next:40000 invalid dropping st:0
+[AVIOContext @ 0000021510827cc0] Statistics: 2569421 bytes read, 0 seeks
+[AVFormatContext @ 0000021510811e80] Opening 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\scene-03.jpg' for reading
+[png_pipe @ 0000021510811e80] Format png_pipe probed with size=2048 and score=99
+[png_pipe @ 0000021510811e80] Before avformat_find_stream_info() pos: 0 bytes read:32768 seeks:0 nb_streams:1
+[png_pipe @ 0000021510811e80] After avformat_find_stream_info() pos: 3111265 bytes read:3111265 seeks:0 frames:1
+[concat @ 000002151080fe00] file:2 stream:0 pts:0 pts_time:0 dts:0 dts_time:0 -> pts:0 pts_time:0 dts:0 dts_time:0
+[AVIOContext @ 000002151095d8c0] Statistics: 3111265 bytes read, 0 seeks
+[AVFormatContext @ 0000021510811e80] Opening 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\scene-04.jpg' for reading
+[png_pipe @ 0000021510811e80] Format png_pipe probed with size=2048 and score=99
+[png_pipe @ 0000021510811e80] Before avformat_find_stream_info() pos: 0 bytes read:32768 seeks:0 nb_streams:1
+[png_pipe @ 0000021510811e80] After avformat_find_stream_info() pos: 3655261 bytes read:3655261 seeks:0 frames:1
+[concat @ 000002151080fe00] file:3 stream:0 pts:0 pts_time:0 dts:0 dts_time:0 -> pts:-230584300921369 pts_time:-9223372036854.759766 dts:-230584300921369 dts_time:-9223372036854.759766
+[concat @ 000002151080fe00] DTS -230584300921369 < 0 out of order
+DTS -230584300921369, next:40000 st:0 invalid dropping
+PTS -230584300921369, next:40000 invalid dropping st:0
+[AVIOContext @ 000002151095e100] Statistics: 3655261 bytes read, 0 seeks
+[AVFormatContext @ 0000021510ab5340] Opening 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\scene-05.jpg' for reading
+[png_pipe @ 0000021510ab5340] Format png_pipe probed with size=2048 and score=99
+[png_pipe @ 0000021510ab5340] Before avformat_find_stream_info() pos: 0 bytes read:32768 seeks:0 nb_streams:1
+[png_pipe @ 0000021510ab5340] After avformat_find_stream_info() pos: 2932097 bytes read:2932097 seeks:0 frames:1
+[concat @ 000002151080fe00] file:4 stream:0 pts:0 pts_time:0 dts:0 dts_time:0 -> pts:0 pts_time:0 dts:0 dts_time:0
+[in#0/concat @ 0000021510817a80] EOF while reading input
+[in#0/concat @ 0000021510817a80] Terminating thread with return code 0 (success)
+[vist#0:0/png @ 0000021510829780] [dec:png @ 0000021510849e00] Decoder thread received EOF packet
+[AVFilterGraph @ 0000021510adea00] Setting 'filename' to value 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\captions.srt'
+[AVFilterGraph @ 0000021510adea00] Setting 'force_style' to value 'FontSize=24,PrimaryColour=&Hffffff,OutlineColour=&H000000,BackColour=&H000000,Bold=1'
+[Parsed_subtitles_0 @ 00000215108a7f80] libass API version: 0x1703020
+[Parsed_subtitles_0 @ 00000215108a7f80] libass source: commit: 0.17.3-79-g1b699559025185e34d21a24cac477ca360cb917d
+[Parsed_subtitles_0 @ 00000215108a7f80] Raster: FreeType 2.13.3
+[Parsed_subtitles_0 @ 00000215108a7f80] Shaper: FriBidi 1.0.16 (SIMPLE) HarfBuzz-ng 10.4.0 (COMPLEX)
+[Parsed_subtitles_0 @ 00000215108a7f80] Initialized
+[AVFormatContext @ 0000021510829040] Opening 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\captions.srt' for reading
+[file @ 0000021510a94300] Setting default whitelist 'file,crypto,data'
+[srt @ 0000021510829040] Format srt probed with size=2048 and score=100
+[srt @ 0000021510829040] Before avformat_find_stream_info() pos: 167 bytes read:167 seeks:0 nb_streams:1
+[srt @ 0000021510829040] All info found
+[srt @ 0000021510829040] After avformat_find_stream_info() pos: 167 bytes read:167 seeks:0 frames:0
+[Parsed_subtitles_0 @ 00000215108a7f80] Using font provider directwrite (with GDI)
+[Parsed_subtitles_0 @ 00000215108a7f80] Event: [Script Info]
+; Script generated by FFmpeg/Lavc61.19.101
+ScriptType: v4.00+
+PlayResX: 384
+PlayResY: 288
+ScaledBorderAndShadow: yes
+YCbCr Matrix: None
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,16,&Hffffff,&Hffffff,&H0,&H0,0,0,0,0,100,100,0,0,1,1,0,2,10,10,10,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+[Parsed_subtitles_0 @ 00000215108a7f80] 
+[Parsed_subtitles_0 @ 00000215108a7f80] Style format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+[Parsed_subtitles_0 @ 00000215108a7f80] [0000021511abb3a0] Style: Default,Arial,16,&Hffffff,&Hffffff,&H0,&H0,0,0,0,0,100,100,0,0,1,1,0,2,10,10,10,1
+[Parsed_subtitles_0 @ 00000215108a7f80] Event format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+[Parsed_subtitles_0 @ 00000215108a7f80] Event at 0, +4000: 0,0,Default,,0,0,0,,HOOK: Immerse in an ultra-realistic journey of golden retrievers ruling
+[Parsed_subtitles_0 @ 00000215108a7f80] Event at 4000, +4000: 1,0,Default,,0,0,0,,the world with joy and love.
+[AVIOContext @ 000002151095d740] Statistics: 167 bytes read, 0 seeks
+[graph -1 input from stream 0:0 @ 00000215108a7580] Setting 'video_size' to value '1024x1792'
+[graph -1 input from stream 0:0 @ 00000215108a7580] Setting 'pix_fmt' to value '2'
+[graph -1 input from stream 0:0 @ 00000215108a7580] Setting 'time_base' to value '1/25'
+[graph -1 input from stream 0:0 @ 00000215108a7580] Setting 'pixel_aspect' to value '0/1'
+[graph -1 input from stream 0:0 @ 00000215108a7580] Setting 'colorspace' to value '0'
+[graph -1 input from stream 0:0 @ 00000215108a7580] Setting 'range' to value '2'
+[graph -1 input from stream 0:0 @ 00000215108a7580] Setting 'frame_rate' to value '25/1'
+[graph -1 input from stream 0:0 @ 00000215108a7580] w:1024 h:1792 pixfmt:rgb24 tb:1/25 fr:25/1 sar:0/1 csp:gbr range:pc
+[format @ 00000215108a6780] Setting 'pix_fmts' to value 'yuv420p|yuvj420p|yuv422p|yuvj422p|yuv444p|yuvj444p|nv12|nv16|nv21|yuv420p10le|yuv422p10le|yuv444p10le|nv20le|gray|gray10le'
+[format @ 00000215108a6780] Setting 'color_ranges' to value 'tv|pc'
+[auto_scale_0 @ 00000215108a8280] w:iw h:ih flags:'' interl:0
+[format @ 00000215108a6780] auto-inserting filter 'auto_scale_0' between the filter 'Parsed_subtitles_0' and the filter 'format'
+[AVFilterGraph @ 0000021510adea00] query_formats: 4 queried, 6 merged, 3 already done, 0 delayed
+[auto_scale_0 @ 00000215108a8280] picking yuv444p out of 14 ref:rgb24 alpha:0
+[auto_scale_0 @ 00000215108a8280] w:1024 h:1792 fmt:rgb24 csp:gbr range:pc sar:0/1 -> w:1024 h:1792 fmt:yuv444p csp:unknown range:tv sar:0/1 flags:0x00000004
+[auto_scale_0 @ 00000215108a8280] [framesync @ 0000021511abcba8] Selected 1/25 time base
+[auto_scale_0 @ 00000215108a8280] [framesync @ 0000021511abcba8] Sync level 1
+[graph -1 input from stream 0:0 @ 00000215108a7580] video frame properties congruent with link at pts_time: 0
+[Parsed_subtitles_0 @ 00000215108a7f80] Copying data in avfilter.
+[vist#0:0/png @ 0000021510829780] [dec:png @ 0000021510849e00] Decoder returned EOF, finishing
+[vist#0:0/png @ 0000021510829780] [dec:png @ 0000021510849e00] Terminating thread with return code 0 (success)
+[Parsed_subtitles_0 @ 00000215108a7f80] fontselect: (Arial, 700, 0) -> Arial-BoldMT, 0, Arial-BoldMT
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 5
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 19
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 35
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 46
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 53
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 64
+[Parsed_subtitles_0 @ 00000215108a7f80] Change happened at time ms:0.000000
+[libx264 @ 0000021510826500] using mv_range_thread = 24
+[libx264 @ 0000021510826500] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2
+[libx264 @ 0000021510826500] profile High 4:4:4 Predictive, level 4.0, 4:4:4, 8-bit
+[libx264 @ 0000021510826500] 264 - core 164 r3204 373697b - H.264/MPEG-4 AVC codec - Copyleft 2003-2025 - http://www.videolan.org/x264.html - options: cabac=1 ref=2 deblock=1:0:0 analyse=0x3:0x113 me=hex subme=6 psy=1 psy_rd=1.00:0.00 mixed_ref=1 me_range=16 chroma_me=1 trellis=1 8x8dct=1 cqm=0 deadzone=21,11 fast_pskip=1 chroma_qp_offset=4 threads=30 lookahead_threads=5 sliced_threads=0 nr=0 decimate=1 interlaced=0 bluray_compat=0 constrained_intra=0 bframes=3 b_pyramid=2 b_adapt=1 b_bias=0 direct=1 weightb=1 open_gop=0 weightp=1 keyint=250 keyint_min=25 scenecut=40 intra_refresh=0 rc_lookahead=30 rc=crf mbtree=1 crf=23.0 qcomp=0.60 qpmin=0 qpmax=69 qpstep=4 ip_ratio=1.40 aq=1:1.00
+Output #0, mp4, to 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\output.mp4':
+  Metadata:
+    encoder         : Lavf61.7.100
+  Stream #0:0, 0, 1/15360: Video: h264 (avc1 / 0x31637661), yuv444p(tv, progressive), 1024x1792, q=2-31, 30 fps, 15360 tbn
+      Metadata:
+        encoder         : Lavc61.19.101 libx264
+      Side data:
+        cpb: bitrate max/min/avg: 0/0/0 buffer size: 0 vbv_delay: N/A
+  Stream #0:1, 0, 1/44100: Audio: aac (LC) (mp4a / 0x6134706D), 44100 Hz, mono, fltp, 128 kb/s
+      Metadata:
+        encoder         : Lavc61.19.101 aac
+[out#0/mp4 @ 0000021510839980] Starting thread...
+[out#0/mp4 @ 0000021510839980] sq: send 0 ts 0.0333333
+[out#0/mp4 @ 0000021510839980] sq: receive 0 ts 0.0333333 queue head 0 ts 1
+[Parsed_subtitles_0 @ 00000215108a7f80] Copying data in avfilter.
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 5
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 19
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 35
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 46
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 53
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 64
+[out#0/mp4 @ 0000021510839980] sq: send 0 ts 0.0666667
+[out#0/mp4 @ 0000021510839980] sq: receive 0 ts 0.0666667 queue head 0 ts 1
+[Parsed_subtitles_0 @ 00000215108a7f80] Copying data in avfilter.
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 5
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 19
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 35
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 46
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 53
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 64
+[out#0/mp4 @ 0000021510839980] sq: send 0 ts 0.1
+[out#0/mp4 @ 0000021510839980] sq: receive 0 ts 0.1 queue head 0 ts 1
+[Parsed_subtitles_0 @ 00000215108a7f80] Copying data in avfilter.
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 5
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 19
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 35
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 46
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 53
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 64
+[out#0/mp4 @ 0000021510839980] sq: send 0 ts 0.133333
+[out#0/mp4 @ 0000021510839980] sq: receive 0 ts 0.133333 queue head 0 ts 1
+[Parsed_subtitles_0 @ 00000215108a7f80] Copying data in avfilter.
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 5
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 19
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 35
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 46
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 53
+[Parsed_subtitles_0 @ 00000215108a7f80] line break at 64
+[auto_scale_0 @ 00000215108a8280] [framesync @ 0000021511abcba8] Sync level 0
+[out_#0:0 @ 00000215108a6a80] EOF on sink link out_#0:0:default.
+[vf#0:0 @ 0000021510827440] Filtergraph returned EOF, finishing
+[vf#0:0 @ 0000021510827440] All consumers returned EOF
+[vf#0:0 @ 0000021510849700] *** dropping frame 4 at ts 0
+[out#0/mp4 @ 0000021510839980] sq: 0 EOF
+[out#0/mp4 @ 0000021510839980] sq: finish 0; head ts 1
+[out#0/mp4 @ 0000021510839980] sq: finish secondary 1; head ts 10.527347
+[out#0/mp4 @ 0000021510839980] sq: finish queue
+[aost#0:1/aac @ 0000021510877800] Encoder thread received EOF
+[vost#0:0/libx264 @ 0000021510826180] Encoder thread received EOF
+[af#0:1 @ 0000021510826f00] All consumers returned EOF
+[aost#0:1/aac @ 0000021510877800] Terminating thread with return code 0 (success)
+[out#0/mp4 @ 0000021510839980] sq: 1 EOF
+[aist#1:0/mp3 @ 0000021510811a80] [dec:mp3float @ 0000021510877e80] Decoder returned EOF, finishing
+[out#0/mp4 @ 0000021510839980] sq: finish queue
+[aist#1:0/mp3 @ 0000021510811a80] All consumers of this stream are done
+[in#1/mp3 @ 0000021510817380] All consumers are done
+[aist#1:0/mp3 @ 0000021510811a80] [dec:mp3float @ 0000021510877e80] Terminating thread with return code 0 (success)
+[in#1/mp3 @ 0000021510817380] Terminating thread with return code 0 (success)
+[af#0:1 @ 0000021510826f00] Terminating thread with return code 0 (success)
+[out#0/mp4 @ 0000021510839980] sq: 0 EOF
+[out#0/mp4 @ 0000021510839980] sq: finish queue
+[vf#0:0 @ 0000021510827440] Terminating thread with return code 0 (success)
+[libx264 @ 0000021510826500] frame=   0 QP=29.56 NAL=3 Slice:I Poc:0   I:7168 P:0    SKIP:0    size=95677 bytes
+[libx264 @ 0000021510826500] frame=   1 QP=28.85 NAL=2 Slice:P Poc:2   I:6271 P:584  SKIP:313  size=81474 bytes
+frame=    2 fps=1.9 q=-1.0 size=       0KiB time=N/A bitrate=N/A dup=0 drop=2 speed=N/A    [libx264 @ 0000021510826500] frame=   2 QP=30.12 NAL=2 Slice:P Poc:4   I:6282 P:560  SKIP:326  size=121952 bytes
+[libx264 @ 0000021510826500] frame=   3 QP=30.77 NAL=2 Slice:P Poc:6   I:6243 P:584  SKIP:341  size=163217 bytes
+[vost#0:0/libx264 @ 0000021510826180] Terminating thread with return code 0 (success)
+[out#0/mp4 @ 0000021510839980] All streams finished
+[out#0/mp4 @ 0000021510839980] Terminating thread with return code 0 (success)
+[AVIOContext @ 0000021510882b00] Statistics: 480217 bytes written, 2 seeks, 5 writeouts
+[out#0/mp4 @ 0000021510839980] Output file #0 (C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\output.mp4):
+[out#0/mp4 @ 0000021510839980]   Output stream #0:0 (video): 4 frames encoded; 4 packets muxed (463009 bytes); 
+[out#0/mp4 @ 0000021510839980]   Output stream #0:1 (audio): 43 frames encoded (44032 samples); 44 packets muxed (15533 bytes); 
+[out#0/mp4 @ 0000021510839980]   Total: 48 packets (478542 bytes) muxed
+[out#0/mp4 @ 0000021510839980] video:452KiB audio:15KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.349186%
+frame=    4 fps=3.2 q=-1.0 Lsize=     469KiB time=00:00:00.06 bitrate=57625.3kbits/s dup=0 drop=2 speed=0.0532x    
+[libx264 @ 0000021510826500] frame I:1     Avg QP:29.56  size: 95677
+[libx264 @ 0000021510826500] frame P:3     Avg QP:29.91  size:122214
+[libx264 @ 0000021510826500] mb I  I16..4: 34.8% 32.6% 32.6%
+[libx264 @ 0000021510826500] mb P  I16..4: 19.5% 48.8% 19.1%  P16..4:  5.4%  1.5%  1.1%  0.0%  0.0%    skip: 4.6%
+[libx264 @ 0000021510826500] 8x8 transform intra:49.4% inter:58.6%
+[libx264 @ 0000021510826500] coded y,u,v intra: 55.2% 27.6% 28.8% inter: 32.3% 23.2% 24.4%
+[libx264 @ 0000021510826500] i16 v,h,dc,p: 30% 23%  7% 41%
+[libx264 @ 0000021510826500] i8 v,h,dc,ddl,ddr,vr,hd,vl,hu: 18% 18% 20%  9%  6%  5%  6%  8%  9%
+[libx264 @ 0000021510826500] i4 v,h,dc,ddl,ddr,vr,hd,vl,hu: 33% 20% 12%  6%  7%  6%  6%  6%  4%
+[libx264 @ 0000021510826500] Weighted P-Frames: Y:0.0% UV:0.0%
+[libx264 @ 0000021510826500] ref P L0: 63.2% 36.8%
+[libx264 @ 0000021510826500] kb/s:27739.20
+[aac @ 0000021510861000] Qavg: 22448.535
+[in#0/concat @ 0000021510817a80] Input file #0 (C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\images.txt):
+[in#0/concat @ 0000021510817a80]   Input stream #0:0 (video): 5 packets read (15108308 bytes); 5 frames decoded; 0 decode errors; 
+[in#0/concat @ 0000021510817a80]   Total: 5 packets (15108308 bytes) demuxed
+[AVIOContext @ 000002151095d340] Statistics: 2932097 bytes read, 0 seeks
+[AVIOContext @ 0000021510820000] Statistics: 680 bytes read, 0 seeks
+[in#1/mp3 @ 0000021510817380] Input file #1 (C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\41108c8d-8066-432c-b988-8a187b53a3a2\temp\audio.mp3):
+[in#1/mp3 @ 0000021510817380]   Input stream #1:0 (audio): 422 packets read (176378 bytes); 413 frames decoded; 0 decode errors (475776 samples); 
+[in#1/mp3 @ 0000021510817380]   Total: 422 packets (176378 bytes) demuxed
+[AVIOContext @ 0000021510811440] Statistics: 196608 bytes read, 0 seeks

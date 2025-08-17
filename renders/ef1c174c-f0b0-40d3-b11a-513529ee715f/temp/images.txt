@@ -1,0 +1,12 @@
+ffconcat version 1.0
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\ef1c174c-f0b0-40d3-b11a-513529ee715f\temp\scene-01.jpg'
+duration 4.780
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\ef1c174c-f0b0-40d3-b11a-513529ee715f\temp\scene-02.jpg'
+duration 4.780
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\ef1c174c-f0b0-40d3-b11a-513529ee715f\temp\scene-03.jpg'
+duration 4.780
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\ef1c174c-f0b0-40d3-b11a-513529ee715f\temp\scene-04.jpg'
+duration 4.780
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\ef1c174c-f0b0-40d3-b11a-513529ee715f\temp\scene-05.jpg'
+duration 4.780
+file 'C:\Users\haim4\Desktop\StoryShort MVP Development Plan\storyshort\renders\ef1c174c-f0b0-40d3-b11a-513529ee715f\temp\scene-05.jpg'

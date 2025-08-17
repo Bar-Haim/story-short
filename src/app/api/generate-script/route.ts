@@ -1,167 +1,181 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { VideoService } from '@/lib/supabase';
-import { v4 as uuidv4 } from 'uuid';
+import { createClient } from '@supabase/supabase-js';
+import { randomUUID } from 'crypto';
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout';
+import { withRetry } from '@/lib/withRetry';
 
-function summarizeText(text: string, maxLength: number = 500): string {
-  if (text.length <= maxLength) return text;
+// Force Node.js runtime (not Edge) to avoid fetch/env issues
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+// Meta text stripping functions
+function stripMeta(s: string): string {
+  const bad = [
+    /as an ai\b/i,
+    /i (cannot|can't|am not able)/i,
+    /i am an? (ai|assistant)/i,
+    /i don'?t have the ability/i,
+    /i'm sorry,? but/i,
+    /unfortunately/i,
+    /i would like to/i,
+    /let me help you/i,
+    /i can help you/i,
+    /here's a/i,
+    /here is a/i,
+  ];
+  let out = (s || '').trim();
+  bad.forEach(r => { out = out.replace(r, ''); });
+  return out.replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function clamp(s: string, max = 200): string {
+  return s.length <= max ? s : s.slice(0, max).replace(/\s+\S*$/, '') + '…';
+}
+
+function parseScriptSections(text: string): { hook: string; body: string; cta: string } {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+  let hook = '', body = '', cta = '';
   
-  // Try to find a good breaking point
-  const truncated = text.substring(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(' ');
-  
-  if (lastSpace > maxLength * 0.8) {
-    return truncated.substring(0, lastSpace) + '...';
+  for (const line of lines) {
+    if (line.startsWith('HOOK:')) {
+      hook = line.replace(/^HOOK:\s*/, '').trim();
+    } else if (line.startsWith('BODY:')) {
+      body = line.replace(/^BODY:\s*/, '').trim();
+    } else if (line.startsWith('CTA:')) {
+      cta = line.replace(/^CTA:\s*/, '').trim();
+    }
   }
   
-  return truncated + '...';
+  return { hook, body, cta };
 }
+
+// Debug environment variables at startup
+console.log('[env] SUPABASE_URL =', process.env.SUPABASE_URL);
+console.log('[env] SERVICE_KEY length =', process.env.SUPABASE_SERVICE_ROLE_KEY?.length);
 
 export async function POST(request: NextRequest) {
   try {
-    const { userText } = await request.json();
-    
-    if (!userText || typeof userText !== 'string') {
-      return NextResponse.json({ error: 'Missing or invalid userText' }, { status: 400 });
+    const body = await request.json();
+    const inputText: string = String(body?.inputText ?? '').trim();
+    if (!inputText) {
+      return NextResponse.json({ ok: false, error: 'Missing inputText' }, { status: 400 });
     }
 
     console.log('📥 Received script generation request');
-    
-    const openRouterApiKey = process.env.OPENROUTER_API_KEY;
-    if (!openRouterApiKey) {
-      return NextResponse.json({ error: 'OpenRouter API key not configured' }, { status: 500 });
-    }
-    
-    if (!openRouterApiKey.startsWith('sk-or-') && !openRouterApiKey.startsWith('sk-proj-')) {
-      return NextResponse.json({ error: 'Missing or invalid API key' }, { status: 500 });
-    }
+    console.log(`🔍 [generate-script] inputText length: ${inputText.length}`);
+    console.log(`🔍 [generate-script] inputText first 200 chars: ${inputText.substring(0, 200)}`);
 
-    console.log('🔑 OpenRouter API key configured, proceeding with generation');
-    console.log('🔍 API Key length:', openRouterApiKey.length);
-    console.log('🔍 API Key starts with:', openRouterApiKey.substring(0, 10) + '...');
-    console.log('🔍 API Key type check:', openRouterApiKey.startsWith('sk-or-') ? 'OpenRouter format' : 'Project format');
+    // Create client (SERVICE ROLE KEY!)
+    const supabase = createClient(
+      process.env.SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
-    // Create video record in database
-    const createResult = await VideoService.createVideo(userText);
-    if (!createResult.success) {
-      console.error('❌ Failed to create video record:', createResult.error);
-      return NextResponse.json({ error: 'Failed to create video record' }, { status: 500 });
-    }
+    // --- 1) Create video record with a pre-generated id (idempotent)
+    const videoId = randomUUID();
+    const insertPayload = { id: videoId, input_text: inputText, status: 'created' as const };
 
-    const videoId = createResult.videoId;
+    await withRetry(async () => {
+      const { error } = await supabase
+        .from('videos')
+        .upsert(insertPayload, { onConflict: 'id' }); // idempotent
+      if (error) throw new Error(error.message);
+      return true;
+    }, { label: 'supabase.insert(video)', maxRetries: 3 });
+
     console.log('✅ Video record created with ID:', videoId);
 
-    // Summarize text if too long
-    const summarizedText = summarizeText(userText);
+    // --- 2) Call OpenRouter with timeout + retries
+    const openrouterUrl = 'https://openrouter.ai/api/v1/chat/completions';
     
-    const prompt = `Create a short video script based on this story: "${summarizedText}"
+    const systemPrompt = `You are a concise copywriter. 
+DO NOT include any meta commentary (no "as an AI...", "I can't...", "I'm sorry but...").
+Return EXACTLY:
+HOOK: <max 200 chars>
+BODY: <max 200 chars>
+CTA: <max 200 chars>
+No extra lines.`;
 
-Generate a script with exactly 3 parts, each under 200 characters:
-1. HOOK: An attention-grabbing opening
-2. BODY: Brief explanation or story
-3. CTA: Call-to-action
+    const userPrompt = `Create a 40-second script from this premise:
+"${inputText}"
 
-Format the response exactly like this:
-HOOK: [hook text]
-BODY: [body text] 
-CTA: [cta text]
-
-Keep the total script under 600 characters for a 40-second voiceover.`;
+Rules:
+- No meta/capability mentions.
+- Keep total <= 600 chars.
+- Plain language, present tense.
+- Return ONLY the 3 labeled lines.`;
 
     const payload = {
       model: 'openai/gpt-4',
-      messages: [{ role: 'user', content: prompt }],
       max_tokens: 300,
       temperature: 0.7,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ]
     };
 
-    console.log('🤖 Calling OpenRouter API...');
-    console.log('📤 Request payload:', JSON.stringify(payload, null, 2));
-    console.log('🔍 Request headers being sent:', {
-      'Authorization': `Bearer ${openRouterApiKey.substring(0, 20)}...`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://storyshort.app',
-      'X-Title': 'StoryShort - AI Video Generation'
-    });
-    console.log('🔍 Authorization header value:', `Bearer ${openRouterApiKey.substring(0, 20)}...`);
-
-    const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${openRouterApiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://storyshort.app',
-        'X-Title': 'StoryShort - AI Video Generation',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    console.log('📡 OpenRouter Response status:', openRouterResponse.status);
-
-    if (!openRouterResponse.ok) {
-      let errorText = await openRouterResponse.text();
-      let errorData;
-      try {
-        errorData = JSON.parse(errorText);
-      } catch (err) {
-        errorData = { error: 'Failed to parse error response', raw: errorText };
+    const res = await withRetry(async () => {
+      const r = await fetchWithTimeout(openrouterUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY!}`,
+          'HTTP-Referer': 'https://storyshort.app',
+          'X-Title': 'StoryShort - AI Video Generation'
+        },
+        body: JSON.stringify(payload)
+      }, 20000);
+      if (!r.ok) {
+        const text = await r.text().catch(() => '<no body>');
+        throw new Error(`OpenRouter ${r.status}: ${text}`);
       }
-      
-      // Update video status to failed
-      await VideoService.updateVideo(videoId!, { 
-        status: 'failed', 
-        error_message: `OpenRouter API error: ${errorData.error || errorText}` 
-      });
-      
-      return NextResponse.json({ 
-        error: 'Failed to generate script from OpenRouter', 
-        details: errorData, 
-        status: openRouterResponse.status 
-      }, { status: 500 });
+      return r;
+    }, { label: 'openrouter.fetch', maxRetries: 3, baseDelayMs: 800 });
+
+    const data = await res.json();
+    const aiScriptText: string =
+      data?.choices?.[0]?.message?.content?.trim?.() || '';
+
+    if (!aiScriptText) {
+      return NextResponse.json({ ok: false, error: 'Empty script from OpenRouter' }, { status: 502 });
     }
 
-    const openRouterData = await openRouterResponse.json();
-    console.log('✅ OpenRouter response received');
+    console.log('📝 Generated script:', aiScriptText);
+
+    // --- 3) Clean and format the script
+    const cleaned = stripMeta(aiScriptText);
+    const { hook, body: bodyText, cta } = parseScriptSections(cleaned);
     
-    const generatedScript = openRouterData.choices[0]?.message?.content?.trim();
-    console.log('📝 Generated script:', generatedScript);
+    // Ensure each section is properly formatted and clamped
+    const finalHook = clamp(hook, 200);
+    const finalBody = clamp(bodyText, 200);
+    const finalCta = clamp(cta, 200);
+    
+    const finalText = `HOOK: ${finalHook}\n\nBODY: ${finalBody}\n\nCTA: ${finalCta}`;
+    
+    console.log('🧹 Cleaned script:', finalText);
 
-    if (!generatedScript) {
-      // Update video status to failed
-      await VideoService.updateVideo(videoId!, { 
-        status: 'failed', 
-        error_message: 'No script content received from OpenRouter' 
-      });
-      
-      return NextResponse.json({ error: 'No script content received from OpenRouter' }, { status: 500 });
-    }
+    // --- 4) Save the cleaned script (script_text + legacy script) + status
+    await withRetry(async () => {
+      const { error } = await supabase
+        .from('videos')
+        .update({
+          script_text: finalText,
+          script: finalText,               // keep legacy in sync
+          status: 'script_generated',
+          error_message: null
+        })
+        .eq('id', videoId);
+      if (error) throw new Error(error.message);
+      return true;
+    }, { label: 'supabase.update(script)', maxRetries: 3 });
 
-    // Update video record with generated script
-    const updateResult = await VideoService.updateVideo(videoId!, {
-      status: 'script_generated',
-      script: generatedScript
-    });
+    console.log('[script] DONE', { videoId });
 
-    if (!updateResult.success) {
-      console.error('❌ Failed to update video with script:', updateResult.error);
-      return NextResponse.json({ error: 'Failed to save script to database' }, { status: 500 });
-    }
-
-    console.log('✅ Script saved to database successfully');
-
-    const responseData = {
-      success: true,
-      script: generatedScript,
-      videoId: videoId
-    };
-
-    console.log('📤 Success response data:', responseData);
-    return NextResponse.json(responseData);
-
-  } catch (error) {
-    console.error('❌ Error in generate-script:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error', 
-      details: error instanceof Error ? error.message : 'Unknown error' 
-    }, { status: 500 });
+    return NextResponse.json({ ok: true, videoId });
+  } catch (e: any) {
+    console.error('[generate-script] fatal:', e?.message || e);
+    return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 });
   }
 }

@@ -69,7 +69,7 @@ async function testOpenRouter() {
        headers: {
          'Authorization': `Bearer ${apiKey}`,
          'Content-Type': 'application/json',
-         'HTTP-Referer': 'http://localhost:3000',
+         'HTTP-Referer': 'http://localhost:4000',
          'X-Title': 'StoryShort',
        },
        body: JSON.stringify({
