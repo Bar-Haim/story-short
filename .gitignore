@@ -73,3 +73,56 @@ scripts/generated-images/
 # System files
 Thumbs.db
 desktop.ini
+
+# Repository cleanup - additional patterns
+# Build artifacts and caches
+.turbo/
+dist/
+build/
+out/
+coverage/
+.vercel/
+.eslintcache
+
+# Dependencies
+node_modules/
+
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+tmp/
+
+# Test and demo directories
+scripts/generated-images/
+cypress/
+playwright/
+e2e/
+__tests__/
+__mocks__/
+
+# Large media files (should be in Supabase storage)
+*.mp4
+*.mov
+*.wav
+*.avi
+*.mkv
+
+# Temporary and scratch files
+temp/
+*.temp
+
+# Test files (root level)
+test-*.js
+test-*.ts
+test-*.cjs
+test-*.mjs
+
+# Demo and debug files
+*-debug.*
+*-demo.*
+samples/
+examples/
+fixtures/
+sandbox/
