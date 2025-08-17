@@ -39,3 +39,37 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Additional cleanup patterns
+# Build artifacts and caches
+.turbo/
+dist/
+.eslintcache
+
+# Large media files (should be in Supabase storage)
+*.mp4
+*.mov
+*.wav
+*.avi
+*.mkv
+
+# Temporary and scratch files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Generated assets (runtime)
+renders/
+outputs/
+exports/
+
+# Demo and test assets
+scripts/generated-images/
+
+# Log files
+*.log
+
+# System files
+Thumbs.db
+desktop.ini

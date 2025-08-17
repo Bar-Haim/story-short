@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { VideoService, sbServer } from '@/lib/supabase-server';
+import { VideoService, StorageService, sbServer } from '@/lib/supabase-server';
 import type { Video } from '@/types/video';
 import { exec } from 'child_process';
 import { promisify } from 'util';
@@ -197,56 +197,14 @@ async function renderVideoInBackground(videoId: string, force: boolean = false) 
 
     await VideoService.updateVideo(videoId, { render_progress: 90 });
 
-    // Step 7: Upload to Supabase
+    // Step 7: Upload to Supabase using enhanced StorageService
     console.log(`☁️ [${videoId}] Uploading to Supabase...`);
     const videoBuffer = await fs.promises.readFile(outputPath);
-    const supabase = sbServer();
     
-    const uploadPath = `renders-videos/videos/${videoId}/final.mp4`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('videos')
-      .upload(uploadPath, videoBuffer, {
-        contentType: 'video/mp4',
-        upsert: true
-      });
-
-    if (uploadError) {
-      throw new Error(`Failed to upload video: ${uploadError.message}`);
-    }
-
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from('videos')
-      .getPublicUrl(uploadPath);
+    // Use enhanced StorageService for reliable upload with availability check
+    const publicUrl = await StorageService.uploadVideo(videoId, videoBuffer);
     
-    const publicUrl = urlData.publicUrl;
-
-    // Step 8: Wait for object availability
-    console.log(`⏳ [${videoId}] Waiting for object availability...`);
-    let isAvailable = false;
-    let attempts = 0;
-    const maxAttempts = 30; // 30 seconds max
-    
-    while (!isAvailable && attempts < maxAttempts) {
-      try {
-        const headResponse = await fetch(publicUrl, { method: 'HEAD' });
-        if (headResponse.ok) {
-          isAvailable = true;
-          console.log(`✅ [${videoId}] Video is now available`);
-        }
-      } catch (error) {
-        // Continue waiting
-      }
-      
-      if (!isAvailable) {
-        attempts++;
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
-      }
-    }
-
-    if (!isAvailable) {
-      throw new Error('Video upload completed but object is not yet available');
-    }
+    console.log(`✅ [${videoId}] Video uploaded and verified:`, publicUrl);
 
     // Step 9: Update database and mark as completed
     await VideoService.updateVideo(videoId, {

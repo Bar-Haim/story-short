@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { VideoService, sbServer } from '@/lib/supabase-server';
+import { VideoService, StorageService, sbServer } from '@/lib/supabase-server';
 import { parseScriptSections, toPlainNarration } from '@/lib/script';
 import { ttsGenerateBuffer } from '@/lib/providers/tts';
 import { generateTTS } from '@/lib/tts';
@@ -142,20 +142,12 @@ async function ensureAudio(videoId: string, scriptText: string): Promise<string>
 
   // Generate TTS using new voice and provider
   const audioBuffer = await ttsGenerateBuffer({ text: narration });
-  const audioBlob = new Blob([audioBuffer], { type: 'audio/mpeg' });
-
-  const supabase = sbServer();
-  const audioBucket = 'renders-audio';
-  const audioPath = `videos/${videoId}/audio.mp3`;
   
-  const { error: uploadError } = await supabase.storage
-    .from(audioBucket)
-    .upload(audioPath, audioBlob, { contentType: 'audio/mpeg', upsert: true });
-
-  if (uploadError) throw new Error(`Audio upload failed: ${uploadError.message}`);
-
-  const { data: urlData } = supabase.storage.from(audioBucket).getPublicUrl(audioPath);
-  return urlData.publicUrl;
+  // Use enhanced StorageService for reliable upload with availability check
+  const publicUrl = await StorageService.uploadAudio(videoId, audioBuffer);
+  
+  console.log('[assets][audio] Audio uploaded and verified:', publicUrl);
+  return publicUrl;
 }
 
 // Helper functions for caption generation
@@ -279,18 +271,11 @@ async function ensureCaptions(videoId: string, scriptText: string): Promise<stri
   
   console.log('[assets][captions] Generated SRT captions spanning full audio duration');
 
-  const supabase = sbServer();
-  const captionsBucket = 'renders-captions';
-  const captionsPath = `videos/${videoId}/captions.srt`;
+  // Use enhanced StorageService for reliable upload with availability check
+  const publicUrl = await StorageService.uploadCaptions(videoId, srt);
   
-  const { error: uploadError } = await supabase.storage
-    .from(captionsBucket)
-    .upload(captionsPath, srt, { contentType: 'application/x-subrip', upsert: true });
-
-  if (uploadError) throw new Error(`Captions upload failed: ${uploadError.message}`);
-
-  const { data: urlData } = supabase.storage.from(captionsBucket).getPublicUrl(captionsPath);
-  return urlData.publicUrl;
+  console.log('[assets][captions] Captions uploaded and verified:', publicUrl);
+  return publicUrl;
 }
 
 // Merge & dedupe image URLs by scene index if you store alongside (optional)
@@ -448,6 +433,20 @@ export async function POST(req: NextRequest) {
     let ranCaptions = false;
     let audioError = null;
     let captionsError = null;
+    
+    // Enhanced error handling for upload failures
+    const handleUploadError = async (type: 'audio' | 'captions', error: any, videoId: string) => {
+      const errorMessage = `${type.charAt(0).toUpperCase() + type.slice(1)} upload failed: ${error.message}`;
+      console.error(`[assets] ${errorMessage}`);
+      
+      // Update video status to failed with specific error
+      await VideoService.updateVideo(videoId, {
+        status: 'assets_failed',
+        error_message: errorMessage
+      });
+      
+      return errorMessage;
+    };
 
     // Update status to indicate audio generation
     if (!audioUrl) {
@@ -466,51 +465,51 @@ export async function POST(req: NextRequest) {
     // Generate audio and captions in parallel if missing
     const generationTasks = [];
 
-    if (!audioUrl) {
-      generationTasks.push(
-        (async () => {
-          try {
-            console.log('[assets] Audio missing, generating TTS...');
-            const generatedAudioUrl = await withRetry(() => generateTTS(video));
-            audioUrl = generatedAudioUrl;
-            ranAudio = true;
-            console.log('[assets] Audio generated successfully');
-            
-            // Update database with audio URL immediately
-            await VideoService.updateVideo(videoId, { audio_url: audioUrl });
-            console.log('[assets] Audio URL saved to database');
-          } catch (error: any) {
-            console.error('[assets] Audio generation failed:', error.message);
-            audioError = error.message;
-          }
-        })()
-      );
-    } else {
-      console.log('[assets] Audio exists, skipping generation');
-    }
+                         if (!audioUrl) {
+                       generationTasks.push(
+                         (async () => {
+                           try {
+                             console.log('[assets] Audio missing, generating TTS...');
+                             const generatedAudioUrl = await withRetry(() => generateTTS(video));
+                             audioUrl = generatedAudioUrl;
+                             ranAudio = true;
+                             console.log('[assets] Audio generated successfully');
+                             
+                             // Update database with audio URL immediately
+                             await VideoService.updateVideo(videoId, { audio_url: audioUrl });
+                             console.log('[assets] Audio URL saved to database');
+                           } catch (error: any) {
+                             console.error('[assets] Audio generation failed:', error.message);
+                             audioError = await handleUploadError('audio', error, videoId);
+                           }
+                         })()
+                       );
+                     } else {
+                       console.log('[assets] Audio exists, skipping generation');
+                     }
 
-    if (!captionsUrl) {
-      generationTasks.push(
-        (async () => {
-          try {
-            console.log('[assets] Captions missing, generating SRT...');
-            const generatedCaptionsUrl = await withRetry(() => generateCaptions(video));
-            captionsUrl = generatedCaptionsUrl;
-            ranCaptions = true;
-            console.log('[assets] Captions generated successfully');
-            
-            // Update database with captions URL immediately
-            await VideoService.updateVideo(videoId, { captions_url: captionsUrl });
-            console.log('[assets] Captions URL saved to database');
-          } catch (error: any) {
-            console.error('[assets] Captions generation failed:', error.message);
-            captionsError = error.message;
-          }
-        })()
-      );
-    } else {
-      console.log('[assets] Captions exist, skipping generation');
-    }
+                         if (!captionsUrl) {
+                       generationTasks.push(
+                         (async () => {
+                           try {
+                             console.log('[assets] Captions missing, generating SRT...');
+                             const generatedCaptionsUrl = await withRetry(() => generateCaptions(video));
+                             captionsUrl = generatedCaptionsUrl;
+                             ranCaptions = true;
+                             console.log('[assets] Captions generated successfully');
+                             
+                             // Update database with captions URL immediately
+                             await VideoService.updateVideo(videoId, { captions_url: captionsUrl });
+                             console.log('[assets] Captions URL saved to database');
+                           } catch (error: any) {
+                             console.error('[assets] Captions generation failed:', error.message);
+                             captionsError = await handleUploadError('captions', error, videoId);
+                           }
+                         })()
+                       );
+                     } else {
+                       console.log('[assets] Captions exist, skipping generation');
+                     }
 
     // Wait for all generation tasks to complete
     if (generationTasks.length > 0) {
